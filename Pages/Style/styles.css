@@ -1,0 +1,578 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family:
+    SF Pro Text,
+    Helvetica Neue,
+    sans-serif;
+  margin: 0;
+  background-color: #1c1c1e;
+  color: #fafafa;
+}
+
+.signin-form {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 360px;
+  padding: 28px 32px;
+  background: #1c1c20;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.signin-form h1 {
+  text-align: center;
+  margin-bottom: 22px;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.signin-form p {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  color: #c9c9d1;
+}
+
+.signin-form input[type="email"],
+.signin-form input[type="text"],
+.signin-form input[type="password"] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #2f2f36;
+  background: #111114;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.signin-form input:focus {
+  border-color: #8ab4f8;
+  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.2);
+}
+
+.signin-form .show-password {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #c9c9d1;
+}
+
+.signin-form input[type="checkbox"] {
+  accent-color: #8ab4f8;
+  cursor: pointer;
+}
+
+.signin-form .login-btn {
+  margin-top: 22px;
+  width: 100%;
+  padding: 10px;
+  background: #8ab4f8;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  color: #111;
+  transition:
+    #111 0.2s ease,
+    transform 0.1s ease;
+}
+
+.signin-form button:hover {
+  background: #a5c2fa;
+}
+
+.signin-form button:active {
+  transform: scale(0.98);
+}
+
+.loginFailed {
+  display: none;
+  background-color: #5f3e48;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #792e2e;
+}
+
+.hidden {
+  display: none;
+}
+
+.loginFailed p:first-child {
+  flex: 1;
+  text-align: center;
+  margin: 0;
+}
+
+.loginFailed .x-btn {
+  margin: 0;
+  cursor: pointer;
+  color: #f85149;
+  margin-left: auto;
+  /* push to right */
+  display: flex;
+  align-items: center;
+}
+
+input {
+  height: 25px;
+}
+
+.options {
+  flex: 1;
+  overflow-x: auto;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+}
+
+.logout-btn {
+  display: block;
+  border: none;
+  background: transparent;
+  color: #8ab4f8;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 5px;
+  transition:
+    #111 0.2s ease,
+    color 0.2s ease;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.logout-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.add-files-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+}
+
+.user {
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-container {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 14px;
+  color: #f5f5f7;
+  background: #1c1c1e;
+}
+
+.table thead {
+  background: #2c2c2e;
+}
+
+.table th {
+  text-align: left;
+  font-weight: 500;
+  padding: 10px 14px;
+  border-bottom: 1px solid #3a3a3c;
+  color: #a1a1a6;
+  cursor: pointer;
+}
+
+.table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #2c2c2e;
+  color: #f5f5f7;
+}
+
+.table tbody tr:hover {
+  background: #2a2a2c;
+  cursor: pointer;
+}
+
+.table td:first-child {
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.options .path {
+  padding-right: 7px;
+  display: inline-block;
+}
+
+.options .root {
+  color: rgb(28, 99, 212);
+}
+
+.options a {
+  font-size: 1.18em;
+  cursor: pointer;
+}
+
+.options a:hover {
+  text-decoration: underline;
+}
+
+.sep {
+  font-size: 1.4em;
+  margin: 0 10px;
+}
+
+.file-upload {
+  flex-shrink: 0;
+  /* prevents shrinking */
+  margin-right: 15px;
+  position: relative;
+}
+
+.file-upload input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-upload span {
+  font-size: 15px;
+  background: #222;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  transition: all 0.2s ease;
+}
+
+.file-upload:hover span {
+  background: #2f2f2f;
+  border-color: #666;
+}
+
+.file-upload:active span {
+  background: #111;
+  transform: scale(0.98);
+}
+
+
+.main {
+  display: grid;
+  grid-template-areas:
+    "     nav       nav"
+    "     toolbar   progress"
+    "     header    progress"
+    "tableContainer progress";
+  grid-template-columns: 1fr 25%;
+  grid-template-rows: auto auto auto 1fr;
+  gap: 5px;
+  height: calc(100vh - 10px);
+}
+
+.nav {
+  grid-area: nav;
+  background-color: #323236;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid hsl(0, 0%, 0%);
+}
+
+
+.top-bar {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* spread path and upload button */
+  padding: 5px 5px 5px 0px;
+}
+
+.tableContainer {
+  grid-area: tableContainer;
+  overflow: auto;
+  /* scroll if table is large */
+}
+
+.progress-tab {
+  grid-area: progress;
+  padding: 10px;
+  overflow-y: auto;
+  border-left: 1px solid #444;
+}
+
+.progress-tab {
+  h1 {
+    text-align: center;
+  }
+}
+
+.parentCont {
+  position: relative;
+  background: #222;
+  padding: 15px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  * {
+    z-index: 3;
+  }
+}
+
+.upload-progress {
+  width: 90%;
+  border-radius: 10px;
+  padding: 15px;
+  color: #eaeaea;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  display: flex;
+  justify-content: center;
+  margin-left: 5%;
+}
+
+.progress-header {
+  margin-left: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-name {
+  font-weight: 500;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress-info {
+  margin-left: 40px;
+  display: flex;
+  justify-content: flex-start;
+  font-size: 12px;
+  color: #ccc;
+}
+
+.start-btn {
+  position: absolute;
+  right: 3px;
+  top: 2px;
+  z-index: 2;
+  display: block;
+  border: none;
+  background: transparent;
+  color: #8ab4f8;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 5px;
+  transition:
+    #111 0.2s ease,
+    color 0.2s ease;
+}
+
+label.start-btn {
+  top: auto;
+  bottom: 2px;
+}
+
+.start-btn input[type="file"] {
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  display: none;
+}
+
+.start-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.start-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.progress-bar {
+  border-radius: 5px;
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 1px;
+  right: 100%;
+  background-color: #296b48;
+  z-index: 2;
+}
+
+.paused-progress-bar {
+  border-radius: 5px;
+  position: absolute;
+  bottom: 0;
+  top: 0;
+  left: 1px;
+  right: 100%;
+  background-color: #792e2e;
+  z-index: 2;
+}
+
+/* Container for toasts */
+#notification-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 1000;
+}
+
+/* Base styles for each toast */
+.toast {
+  min-width: 250px;
+  padding: 15px;
+  border-radius: 4px;
+  color: white;
+  font-family: sans-serif;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease-out;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.toast-info {
+  background-color: rgb(41, 86, 107);
+}
+
+.toast-success {
+  background-color: rgb(41, 107, 72);
+}
+
+.toast-failure {
+  background-color: rgb(107, 41, 41);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toast.out {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+@keyframes shrink {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
+}
+
+/* Icon style */
+.toast-icon {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.log-progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.5);
+  width: 100%;
+  transform-origin: left;
+  animation: shrink 5s linear forwards;
+}
+
+#chunk-size {
+  flex-shrink: 0;
+  margin-right: 15px;
+  font-size: 15px;
+  background: #222;
+  color: white;
+  padding: 5.5px 10px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  transition: all 0.2s ease;
+}
+
+.toolbar {
+  grid-area: toolbar;
+  display: flex;
+  align-items: center;
+  margin-top: 20px;
+  padding: 0px 15px;
+}
+
+.cancel-btn {
+  position: absolute;
+  z-index: 2;
+  display: block;
+  border: none;
+  background: transparent;
+  color: #f85149;
+  font-size: 15px;
+  cursor: pointer;
+  padding: 5px 8px;
+  border-radius: 5px;
+  transition:
+    #111 0.2s ease,
+    color 0.2s ease;
+}
+
+.folder-input {
+  height: 31px;
+  padding: 5.5px 10px;
+  border-radius: 6px;
+  border: 1px solid #2f2f36;
+  background: #111114;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+
+}

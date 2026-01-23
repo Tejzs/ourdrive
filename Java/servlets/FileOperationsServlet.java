@@ -1,0 +1,100 @@
+package servlets;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.json.JSONObject;
+
+import utility.SessionData;
+import utility.Utils;
+
+public class FileOperationsServlet extends HttpServlet {
+    private static final String CLASS_NAME = "FileOperations";
+    private String baseDir = "";
+
+    @Override
+    public void init() {
+        baseDir = Utils.getServerHomeInServer(getServletContext()) + "Files" + File.separatorChar;
+    }
+
+    private static void deleteFolderRecursive(File folder) {
+        for (File file : folder.listFiles()) {
+            if (file.isFile()) {
+                file.delete();
+            } else {
+                deleteFolderRecursive(file);
+            }
+        }
+        folder.delete();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        PrintWriter out = response.getWriter();
+        
+        String mail = SessionData.getThreadLocalSessionData().getMail();
+        String method = request.getParameter("method");
+
+        String parentDir;
+        String folderName;
+        String[] files;
+
+        JSONObject output = new JSONObject();
+
+        switch (method) {
+            case "mkdir":
+                parentDir = baseDir + File.separatorChar + mail + File.separatorChar + request.getParameter("parent");
+                folderName = request.getParameter("folder");
+                new File(parentDir, Utils.getNonDuplicateFileName(parentDir, folderName)).mkdir();
+                Utils.sendSuccessResp(out, output);
+                break;
+
+            case "mkdirf":
+                parentDir = baseDir + File.separatorChar + mail + File.separatorChar + request.getParameter("parent");
+                folderName = request.getParameter("folder");
+                boolean exists = Utils.checkExists(parentDir, folderName);
+                if (!exists) {
+                    new File(parentDir, Utils.getNonDuplicateFileName(parentDir, folderName)).mkdir();
+                }
+                Utils.sendSuccessResp(out, output.put("exists", exists));
+                break;
+
+
+            case "delete":
+                parentDir = baseDir + File.separatorChar + mail + File.separatorChar + request.getParameter("parent");
+                files = request.getParameter("files").split(",");
+
+                for (String fileName : files) {
+                    File file = new File(parentDir, fileName);
+
+                    if (!file.exists()) {
+                        output.put(fileName, "Not exists");
+                        continue;
+                    }
+
+                    if (file.isFile()) {
+                        file.delete();
+                    } else {
+                        deleteFolderRecursive(file);
+                    }
+
+                }
+                Utils.sendSuccessResp(out, output);
+                break;
+
+            case "download":
+                break;
+
+            case "share":
+                break;
+        
+            default:
+                break;
+        }
+    }
+}

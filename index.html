@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="./Pages/Style/styles.css" />
+</head>
+
+<body>
+  <main>
+    <div class="main">
+      <div class="nav">
+        <h1 id="" class="user">OurDrive</h1>
+        <div class="profile-container">
+          <p id="profile">User</p>
+          <p class="sep"></p>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+      </div>
+      <div id="tabSection" class="top-bar">
+        <div id="options" class="options">
+          <a id="root" class="root" onclick="retrieveRootPath()">root</a>
+          <p id="sep" class="sep">/</p>
+        </div>
+        <select id="chunk-size">
+          <option value="auto">Auto</option>
+          <option value="1">1MB</option>
+          <option value="5">5MB</option>
+          <option value="10">10MB</option>
+          <option value="20">20MB</option>
+          <option value="50">50MB</option>
+          <option value="100">100MB</option>
+          <option value="200">200MB</option>
+        </select>
+        <label class="file-upload">
+          <input type="file" id="fileUpload" multiple />
+          <span>Browse Files</span>
+        </label>
+        <label class="file-upload">
+          <span onclick="UploadFiles()">Upload Files</span>
+        </label>
+        <label class="file-upload">
+          <input type="file" id="folderUpload" directory webkitdirectory multiple />
+          <span>Browse Folders</span>
+        </label>
+        <label class="file-upload">
+          <span onclick="UploadFolders()">Upload Folders</span>
+        </label>
+      </div>
+      <div id="tabSection" class="toolbar">
+        <label class="file-upload">
+          <span onclick="deleteSelected()">Delete</span>
+        </label>
+        <label class="file-upload">
+          <span>Download</span>
+        </label>
+        <label class="file-upload" onclick="newFolder()">
+          <span>New Folder</span>
+        </label>
+        <label class="file-upload">
+          <span>Share</span>
+        </label>
+        <input id="folderInput" class="folder-input" type="text" />
+      </div>
+      <div class="tableContainer">
+        <table class="table">
+          <thead>
+            <tr>
+              <th><input type="checkbox" id="select-all" oninput="selectAll()"></th>
+              <th id="name">Name ↑</th>
+              <th id="type">Type</th>
+              <th id="size">Size</th>
+              <th id="date">Date</th>
+              <th id="mainOwner">mainOwner</th>
+            </tr>
+          </thead>
+          <tbody id="files"></tbody>
+        </table>
+      </div>
+      <div class="progress-tab">
+        <h1>Transfer Status</h1>
+        <div id="progressBar" class="upload-progress">
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/build/sha256.min.js"></script>
+<script src="./Pages/js/script.js" defer></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    updateProfile();
+    getPathData();
+    retrieveFile("/");
+    getActiveTasks();
+  });
+</script>
+
+</html>
