@@ -35,18 +35,12 @@
           <option value="200">200MB</option>
         </select>
         <label class="file-upload">
-          <input type="file" id="fileUpload" multiple />
+          <input onchange="UploadFiles()" type="file" id="fileUpload" multiple />
           <span>Browse Files</span>
         </label>
         <label class="file-upload">
-          <span onclick="UploadFiles()">Upload Files</span>
-        </label>
-        <label class="file-upload">
-          <input type="file" id="folderUpload" directory webkitdirectory multiple />
+          <input onchange="uploadFolders()" type="file" id="folderUpload" directory webkitdirectory multiple />
           <span>Browse Folders</span>
-        </label>
-        <label class="file-upload">
-          <span onclick="UploadFolders()">Upload Folders</span>
         </label>
       </div>
       <div id="tabSection" class="toolbar">
@@ -56,13 +50,13 @@
         <label class="file-upload">
           <span>Download</span>
         </label>
-        <label class="file-upload" onclick="newFolder()">
-          <span>New Folder</span>
-        </label>
         <label class="file-upload">
           <span>Share</span>
         </label>
-        <input id="folderInput" class="folder-input" type="text" />
+        <label class="new-folder">
+          <span onclick="newFolder()">New Folder</span>
+          <input id="folderInput" class="folder-input" type="text" placeholder="Enter Folder Name"/>
+        </label>
       </div>
       <div class="tableContainer">
         <table class="table">

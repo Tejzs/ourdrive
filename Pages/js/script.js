@@ -817,7 +817,7 @@ function cancelUpload(uploadId) {
     });
 }
 
-function UploadFolders() {
+function uploadFolders() {
   let chuckSize = document.getElementById("chunk-size").value;
   startFolderUpload(chuckSize);
 }

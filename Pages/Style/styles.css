@@ -530,16 +530,28 @@ label.start-btn {
 }
 
 #chunk-size {
+  box-sizing: border-box;
+  height: 36px;
+  line-height: 36px;
   flex-shrink: 0;
   margin-right: 15px;
   font-size: 15px;
   background: #222;
   color: white;
-  padding: 5.5px 10px;
+  padding: 0 28px 0 10px;    /* space for arrow */
   border-radius: 5px;
   border: 1px solid #444;
-  transition: all 0.2s ease;
+  outline: none;
 }
+
+#chunk-size:focus,
+#chunk-size:focus-visible {
+  outline: none;
+  box-shadow: none;
+  border-color: #444; /* keep same */
+}
+
+
 
 .toolbar {
   grid-area: toolbar;
@@ -565,14 +577,40 @@ label.start-btn {
     color 0.2s ease;
 }
 
-.folder-input {
-  height: 31px;
-  padding: 5.5px 10px;
-  border-radius: 6px;
-  border: 1px solid #2f2f36;
-  background: #111114;
-  color: #fff;
-  font-size: 14px;
-  outline: none;
+.new-folder {
+  display: inline-flex;
+  align-items: center;
+}
 
+.new-folder span,
+.new-folder input {
+  box-sizing: border-box;
+  height: 31px;
+  line-height: 1;
+}
+
+.new-folder span {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  background-color: #222;
+  border: 1px solid #444;
+  border-right: none;
+  border-radius: 6px 0 0 6px;
+}
+
+.new-folder input {
+  padding: 0 10px;
+  background-color: #222;
+  border: 1px solid #2f2f36;
+  border-left: none;
+  border-radius: 0 6px 6px 0;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.new-folder input:focus,
+.new-folder input:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
