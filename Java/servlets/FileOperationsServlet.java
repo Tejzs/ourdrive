@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 
 import utility.SessionData;
+import utility.Logger;
 import utility.Utils;
 
 public class FileOperationsServlet extends HttpServlet {
@@ -50,6 +51,7 @@ public class FileOperationsServlet extends HttpServlet {
             case "mkdir":
                 parentDir = baseDir + File.separatorChar + mail + File.separatorChar + request.getParameter("parent");
                 folderName = request.getParameter("folder");
+
                 new File(parentDir, Utils.getNonDuplicateFileName(parentDir, folderName)).mkdir();
                 Utils.sendSuccessResp(out, output);
                 break;

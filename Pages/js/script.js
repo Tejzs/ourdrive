@@ -785,7 +785,6 @@ async function createFolder(name, dir = "") {
     const data = await resp.json();
       console.log(data);
       if (data.status === "success" && data.exists == false) {
-        Logger.success("Created folder");
         return true;
       }
       else if (data.exists == true) {
@@ -819,105 +818,12 @@ function cancelUpload(uploadId) {
 
 function uploadFolders() {
   let chuckSize = document.getElementById("chunk-size").value;
-  startFolderUpload2(chuckSize);
-}
-
-async function startFolderUpload(chunksize) {
-  const files = document.getElementById("folderUpload").files;
-  const folders = new Map();
-  for (const file of files) {
-    const relativePath = file.webkitRelativePath;
-    const directoryName = relativePath.substring(0, relativePath.lastIndexOf('/'));
-    if (directoryName && !folders.has(directoryName)) {
-      dirName = directoryName.substring(directoryName.lastIndexOf('/') + 1, directoryName.length);
-      dirPath = directoryName.substring(0, directoryName.lastIndexOf('/') + 1);
-      if (dirName == dirPath) {
-        folders.set(dirName, "");
-      }
-      else {
-        folders.set(dirName, dirPath);
-      }
-    }
-  }
-  let canProceed = false;
-  for (const name of folders) {
-    canProceed = await createFolder(name[0], name[1]);
-    if (canProceed === false) {
-      return;
-    }
-  }
-  console.log(folders);
-
-  if (files.length == 0) {
-    Logger.failure("No Folders selected");
-  }
-
-  for (let i = 0; i < files.length; i++) {
-    let file = files[i];
-    if (chunksize == "auto") {
-      chunksize = getOptimalChunkSize(file.size);
-    }
-
-    const fileFingerPrint = await createFingerprint(file);
-    console.log(fileFingerPrint)
-    paused = false;
-
-    let metadata = await uploadMetaData(file, fileFingerPrint, chunksize * 1024 * 1024, file.webkitRelativePath.substring(0, file.webkitRelativePath.lastIndexOf('/') + 1));
-    currentChunks[metadata.uploadId] = 0;
-    uploadChunk(file, metadata.uploadId, fileFingerPrint, chunksize * 1024 * 1024, false, false);
-  }
-  const fileInput = document.getElementById("fileUpload");
-  fileInput.value = "";
-}
-
-// async function startFolderUpload2(chunksize) {
-//   const files = document.getElementById("folderUpload").files;
-//   const folders = [];
-//   for (const file of files) {
-//     const relativePath = file.webkitRelativePath;
-//     const directoryName = relativePath.substring(0, relativePath.lastIndexOf('/'));
-//     await createRequiredFolders(folders, directoryName);
-//   }
-
-//   if (files.length == 0) {
-//     Logger.failure("No Folders selected");
-//   }
-
-//   for (let i = 0; i < files.length; i++) {
-//     let file = files[i];
-//     if (chunksize == "auto") {
-//       chunksize = getOptimalChunkSize(file.size);
-//     }
-
-//     const fileFingerPrint = await createFingerprint(file);
-//     console.log(fileFingerPrint)
-//     paused = false;
-
-//     let metadata = await uploadMetaData(file, fileFingerPrint, chunksize * 1024 * 1024, file.webkitRelativePath.substring(0, file.webkitRelativePath.lastIndexOf('/') + 1));
-//     currentChunks[metadata.uploadId] = 0;
-//     uploadChunk(file, metadata.uploadId, fileFingerPrint, chunksize * 1024 * 1024, false, false);
-//   }
-//   const fileInput = document.getElementById("folderUpload");
-//   fileInput.value = "";
-// }
-
-function createRequiredFolders(folders, filePath) {
-  let splitFolders = filePath.split("/");
-  let finished = "";
-
-  splitFolders.forEach(async (folder) => {
-    if (!folders.includes(folder)) {
-      console.log(folder);
-      await createFolder(folder, currentDir + finished);
-      folders.push(folder);
-    }
-    finished += folder + "/";
-  });
+  startFolderUpload(chuckSize);
 }
 
 let folderss = [];
 
-async function startFolderUpload2(chunksize) {
+async function startFolderUpload(chunksize) {
   let currDir = currentDir;
   const files = document.getElementById("folderUpload").files;
   for (const file of files) {
@@ -925,6 +831,9 @@ async function startFolderUpload2(chunksize) {
     const directoryName = relativePath.substring(0, relativePath.lastIndexOf('/'));
     await createRequiredFolders(directoryName, currDir);
   }
+
+  Logger.success("Created folder");
+
 
   if (files.length == 0) {
     Logger.failure("No Folders selected");
@@ -956,10 +865,9 @@ async function createRequiredFolders(filePath, currDir) {
   let finished = "";
     for (let i = 0; i < splitFolders.length; i++) {
       let folder = splitFolders[i];
-      if (!folderss.includes(folder)) {
-        console.log(currDir, folder);
+      if (!folderss.includes(finished + folder)) {
         await createFolder(folder, currDir + "/" + finished);
-        folderss.push(folder);
+        folderss.push(finished + folder);
     }
     finished += folder + "/";
   };

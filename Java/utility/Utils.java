@@ -119,7 +119,7 @@ public class Utils {
         File directory = new File(filepath);
 
         if (!directory.exists() || !directory.isDirectory()) {
-            throw new IllegalArgumentException("Invalid directory path");
+            throw new IllegalArgumentException("Invalid directory path: " + filepath);
         }
 
         String name;
