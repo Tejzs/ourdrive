@@ -777,10 +777,10 @@ function newFolder() {
 }
 
 async function createFolder(name, dir = "") {
-  await new Promise(r => setTimeout(r, 1000));
+  await new Promise(r => setTimeout(r, 100));
   try {
     const resp = await fetch(
-      `./file-operations?method=mkdirf&parent=${currentDir + "/" + dir}&folder=${name}`
+      `./file-operations?method=mkdirf&parent=${dir}&folder=${name}`
     );
     const data = await resp.json();
       console.log(data);
@@ -819,7 +819,7 @@ function cancelUpload(uploadId) {
 
 function uploadFolders() {
   let chuckSize = document.getElementById("chunk-size").value;
-  startFolderUpload(chuckSize);
+  startFolderUpload2(chuckSize);
 }
 
 async function startFolderUpload(chunksize) {
@@ -868,4 +868,99 @@ async function startFolderUpload(chunksize) {
   }
   const fileInput = document.getElementById("fileUpload");
   fileInput.value = "";
+}
+
+// async function startFolderUpload2(chunksize) {
+//   const files = document.getElementById("folderUpload").files;
+//   const folders = [];
+//   for (const file of files) {
+//     const relativePath = file.webkitRelativePath;
+//     const directoryName = relativePath.substring(0, relativePath.lastIndexOf('/'));
+//     await createRequiredFolders(folders, directoryName);
+//   }
+
+//   if (files.length == 0) {
+//     Logger.failure("No Folders selected");
+//   }
+
+//   for (let i = 0; i < files.length; i++) {
+//     let file = files[i];
+//     if (chunksize == "auto") {
+//       chunksize = getOptimalChunkSize(file.size);
+//     }
+
+//     const fileFingerPrint = await createFingerprint(file);
+//     console.log(fileFingerPrint)
+//     paused = false;
+
+//     let metadata = await uploadMetaData(file, fileFingerPrint, chunksize * 1024 * 1024, file.webkitRelativePath.substring(0, file.webkitRelativePath.lastIndexOf('/') + 1));
+//     currentChunks[metadata.uploadId] = 0;
+//     uploadChunk(file, metadata.uploadId, fileFingerPrint, chunksize * 1024 * 1024, false, false);
+//   }
+//   const fileInput = document.getElementById("folderUpload");
+//   fileInput.value = "";
+// }
+
+function createRequiredFolders(folders, filePath) {
+  let splitFolders = filePath.split("/");
+  let finished = "";
+
+  splitFolders.forEach(async (folder) => {
+    if (!folders.includes(folder)) {
+      console.log(folder);
+      await createFolder(folder, currentDir + finished);
+      folders.push(folder);
+    }
+    finished += folder + "/";
+  });
+}
+
+let folderss = [];
+
+async function startFolderUpload2(chunksize) {
+  let currDir = currentDir;
+  const files = document.getElementById("folderUpload").files;
+  for (const file of files) {
+    const relativePath = file.webkitRelativePath;
+    const directoryName = relativePath.substring(0, relativePath.lastIndexOf('/'));
+    await createRequiredFolders(directoryName, currDir);
+  }
+
+  if (files.length == 0) {
+    Logger.failure("No Folders selected");
+  }
+
+  for (let i = 0; i < files.length; i++) {
+    let file = files[i];
+    const relativePath = file.webkitRelativePath;
+    const directoryName = relativePath.substring(0, relativePath.lastIndexOf('/'));
+
+    if (chunksize == "auto") {
+      chunksize = getOptimalChunkSize(file.size);
+    }
+
+    const fileFingerPrint = await createFingerprint(file);
+    console.log(fileFingerPrint)
+    paused = false;
+
+    let metadata = await uploadMetaData(file, fileFingerPrint, chunksize * 1024 * 1024, directoryName);
+    currentChunks[metadata.uploadId] = 0;
+    uploadChunk(file, metadata.uploadId, fileFingerPrint, chunksize * 1024 * 1024, false, false);
+  }
+  const fileInput = document.getElementById("folderUpload");
+  fileInput.value = "";
+}
+
+async function createRequiredFolders(filePath, currDir) {
+  let splitFolders = filePath.split("/");
+  let finished = "";
+    for (let i = 0; i < splitFolders.length; i++) {
+      let folder = splitFolders[i];
+      if (!folderss.includes(folder)) {
+        console.log(currDir, folder);
+        await createFolder(folder, currDir + "/" + finished);
+        folderss.push(folder);
+    }
+    finished += folder + "/";
+  };
 }
