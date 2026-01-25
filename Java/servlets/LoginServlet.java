@@ -1,5 +1,6 @@
 package servlets;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import javax.servlet.ServletException;
@@ -15,7 +16,14 @@ import utility.Utils;
 import utility.Logger;
 
 public class LoginServlet extends HttpServlet {
-    String className = "LoginServlet";
+    private static final String className = "LoginServlet";
+    private String storeDir = "";
+
+    @Override
+    public void init() {
+        storeDir = Utils.getServerHomeInServer(getServletContext()) + "Files" ;
+    }
+
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -31,6 +39,7 @@ public class LoginServlet extends HttpServlet {
             boolean created = authenticator.addNewUser(mail, pass);
             if (created) {
                 Utils.sendSuccessResp(out, output);
+                new File(storeDir + File.separatorChar + mail).mkdir();
             } else {
                 Utils.sendFailureResp(out, output, "User already exists");
             }
@@ -68,9 +77,5 @@ public class LoginServlet extends HttpServlet {
             Utils.sendFailureResp(out, output, "Internal server error.");
             e.printStackTrace();
         }
-    }
-
-    @Override
-    public void destroy() {
     }
 }

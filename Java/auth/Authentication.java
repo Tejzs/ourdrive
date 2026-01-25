@@ -83,11 +83,10 @@ public class Authentication {
             return false;
         }
 
-        String hashPass = Utils.hashHex(pass);
 
         PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO Users (mail, pass_hash) VALUES ( ?, ? )");
         preparedStatement.setString(1, mail);
-        preparedStatement.setString(2, hashPass);
+        preparedStatement.setString(2, pass);
 
         preparedStatement.executeUpdate();
 

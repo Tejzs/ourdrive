@@ -16,7 +16,7 @@ import org.json.JSONArray;
 import utility.Utils;
 import meta.FileUploadMeta;
 import utility.SessionData;
-import storage.InMemoryStoreHandler;
+import storage.DataStorage;
 
 public class FileUploadStatus extends HttpServlet {
     private static final String CLASS_NAME = "FileUploadStatus";
@@ -31,7 +31,7 @@ public class FileUploadStatus extends HttpServlet {
 
         switch (method) {
             case "list":
-                Set<Entry<Object, Serializable>> entries = InMemoryStoreHandler.getFileUploadMetaStore().getEntrySet();
+                Set<Entry<Object, Serializable>> entries = DataStorage.getFileUploadMetaStore().getEntrySet();
                 JSONArray metaDatas = new JSONArray();
 
                 for (Entry<Object, Serializable> entry : entries) {
@@ -51,7 +51,7 @@ public class FileUploadStatus extends HttpServlet {
                 break;
             case "delete":
                 String uploadId = request.getParameter("uploadId");
-                InMemoryStoreHandler.getFileUploadMetaStore().delete(uploadId);
+                DataStorage.getFileUploadMetaStore().delete(uploadId);
                 Utils.sendSuccessResp(out, new JSONObject());
                 break;
             default:

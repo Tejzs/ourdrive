@@ -1,0 +1,82 @@
+package operations;
+
+import java.io.File;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import meta.FileOperationsMeta;
+import meta.FileOperationsMeta.TaskName;
+import meta.FileOperationsMeta.ProcessState;
+import storage.DataStorage;
+import utility.Utils;
+import utility.file.FileChunker;
+
+public class FileOperationsProcessor implements Runnable {
+    private AtomicInteger threadUsed = new AtomicInteger();
+
+    public void run() {
+        while (true) {
+            try {
+                Thread.sleep(3000);
+            } catch (Exception e) {
+                e.printStackTrace();
+                continue;
+            }
+
+            if (threadUsed.get() > 3) {
+                return;
+            }
+
+            for (FileOperationsMeta meta : getUnstartedMeta()) {
+                new Thread(new ProcessMetaData(meta)).start();
+            }
+        }
+    }
+
+    public static List<FileOperationsMeta> getUnstartedMeta() {
+        List<FileOperationsMeta> unstartedMetas = new ArrayList<>();
+
+        for (Serializable meta : DataStorage.getFileOperationsMetaStore().values()) {
+            FileOperationsMeta operationMeta = (FileOperationsMeta) meta;
+
+            if (operationMeta.getProcessState().equals(ProcessState.NOT_STARTED)) {
+                unstartedMetas.add(operationMeta);
+
+                if (unstartedMetas.size() > 3) {
+                    return unstartedMetas;
+                }
+            }
+        }
+
+        return unstartedMetas;
+    }
+
+    private static class ProcessMetaData implements Runnable {
+        private FileOperationsMeta meta;
+
+        private ProcessMetaData(FileOperationsMeta meta) {
+            this.meta = meta;
+        }
+
+        @Override
+        public void run() {
+            TaskName task = meta.getTaskName();
+
+            String newFileNameOrPath = meta.getFileName();
+            String filePath = meta.getFolderPath();
+
+            switch (task) {
+                case UNCHUNK_FROM_FOLDER:
+                    Utils.getLogger("FileOperationsProcessor").log("Processing unchunk. ", meta.getUploadId());
+                    new FileChunker(new File(filePath), new File(newFileNameOrPath), meta).assembleChunksFromFolder();
+                    break;
+
+                default:
+                    break;
+            }
+            meta.setProcessState(ProcessState.COMPLETED);
+        }
+    }
+}
