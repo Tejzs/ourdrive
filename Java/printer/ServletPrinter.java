@@ -1,7 +1,5 @@
 package printer;
 
-import config.Properties;
-
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -9,13 +7,13 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 public class ServletPrinter {
-    private static final String LOG_FILE = Properties.getLogPath();
+    private static final String LOG_FILE = "/mnt/wwn-0x5000c500c67d4454-part1/Server/apache-tomcat-9.0.98/webapps/FileStorage/Log/log.log";
 
     File file;
     String className;
 
     public ServletPrinter() {
-        this("");
+        this("noClass");
     }   
     public ServletPrinter(String className) {
         file = new File(LOG_FILE);

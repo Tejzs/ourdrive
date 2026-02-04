@@ -78,7 +78,10 @@
           <h1>Transfer Status</h1>
         </div>
         <div id="chunkBar" class="chunk-status">
-          <h1>Chunk Transfer Status</h1>
+          <h1>File Operation Status</h1>
+          <div id="chunkStatus">
+
+          </div>
         </div>
       </div>
     </div>
@@ -92,6 +95,7 @@
     getPathData();
     retrieveFile("/");
     getActiveTasks();
+    activeFileOperationStatus();
   });
 </script>
 
