@@ -81,4 +81,15 @@
         <url-pattern>/file-operations</url-pattern>
     </servlet-mapping>
     <!-- End of ervlets/FileOperations -->
+
+    <!-- Start of ervlets/OperationsStatusServlet -->
+    <servlet>
+        <servlet-name>operationsstatusservlet</servlet-name>
+        <servlet-class>servlets.OperationsStatusServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>operationsstatusservlet</servlet-name>
+        <url-pattern>/operations-status</url-pattern>
+    </servlet-mapping>
+    <!-- End of ervlets/OperationsStatusServlet -->
 </web-app>

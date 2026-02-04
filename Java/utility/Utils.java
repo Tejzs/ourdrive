@@ -140,4 +140,15 @@ public class Utils {
         }
         return false;
     }
+
+    public static void deleteFolderRecursive(File folder) {
+        for (File file : folder.listFiles()) {
+            if (file.isFile()) {
+                file.delete();
+            } else {
+                deleteFolderRecursive(file);
+            }
+        }
+        folder.delete();
+    }
 }

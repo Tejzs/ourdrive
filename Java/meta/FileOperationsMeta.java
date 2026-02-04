@@ -2,6 +2,8 @@ package meta;
 
 import java.io.Serializable;
 
+import org.json.JSONObject;
+
 public class FileOperationsMeta implements Serializable {
 
     public static enum TaskName {
@@ -9,26 +11,29 @@ public class FileOperationsMeta implements Serializable {
     }
 
     public static enum ProcessState {
-        NOT_STARTED, PROCESSED, COMPLETED, FAILED;
+        NOT_STARTED, PROCESSING, COMPLETED, FAILED;
     }
 
     private String fileName;
+    private String initiator;
     private long chunkSize;
     private int totalChunks;
-    private String uploadId;
+    private String taskId;
     private String folderPath;
     private int percentFinished = 0;
-    TaskName task;
+    private TaskName task;
     private ProcessState processState;
 
-    public FileOperationsMeta(String filename, long chunkSize, int totalChunks, String uploadId, String folderPath, TaskName task) {
+    public FileOperationsMeta(String filename, long chunkSize, int totalChunks, String taskId, String folderPath, TaskName task,
+            String initiator) {
         this.fileName = filename;
         this.chunkSize = chunkSize;
         this.totalChunks = totalChunks;
-        this.uploadId = uploadId;
+        this.taskId = taskId;
         this.folderPath = folderPath;
         this.task = task;
         this.processState = ProcessState.NOT_STARTED;
+        this.initiator = initiator;
     }
 
     public String getFileName() {
@@ -43,8 +48,8 @@ public class FileOperationsMeta implements Serializable {
         return totalChunks;
     }
 
-    public String getUploadId() {
-        return uploadId;
+    public String getTaskId() {
+        return taskId;
     }
 
     public int getPercentFinished() {
@@ -69,5 +74,22 @@ public class FileOperationsMeta implements Serializable {
 
     public void setProcessState(ProcessState processState) {
         this.processState = processState;
-    }    
+    }  
+
+    public String getInitiator() {
+        return initiator;
+    }
+
+
+    public JSONObject toJson() {
+        JSONObject res = new JSONObject();
+        res.put("completed", getPercentFinished());
+        res.put("taskId", getTaskId());
+        res.put("fileName", getFileName());
+        res.put("taskName", getTaskName());
+        res.put("folderPath", getFolderPath());
+        res.put("state", getProcessState().name());
+
+        return res;
+    }
 }

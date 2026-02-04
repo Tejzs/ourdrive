@@ -23,17 +23,6 @@ public class FileOperationsServlet extends HttpServlet {
         baseDir = Utils.getServerHomeInServer(getServletContext()) + "Files" + File.separatorChar;
     }
 
-    private static void deleteFolderRecursive(File folder) {
-        for (File file : folder.listFiles()) {
-            if (file.isFile()) {
-                file.delete();
-            } else {
-                deleteFolderRecursive(file);
-            }
-        }
-        folder.delete();
-    }
-
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         PrintWriter out = response.getWriter();
@@ -69,7 +58,7 @@ public class FileOperationsServlet extends HttpServlet {
 
             case "delete":
                 parentDir = baseDir + File.separatorChar + mail + File.separatorChar + request.getParameter("parent");
-                files = request.getParameter("files").split(",");
+                files = request.getParameter("files").split("|");
 
                 for (String fileName : files) {
                     File file = new File(parentDir, fileName);
@@ -82,7 +71,7 @@ public class FileOperationsServlet extends HttpServlet {
                     if (file.isFile()) {
                         file.delete();
                     } else {
-                        deleteFolderRecursive(file);
+                        Utils.deleteFolderRecursive(file);
                     }
 
                 }
@@ -96,6 +85,7 @@ public class FileOperationsServlet extends HttpServlet {
                 break;
         
             default:
+                Utils.sendFailureResp(out, new JSONObject(), "Method not implemented: " + method);
                 break;
         }
     }
