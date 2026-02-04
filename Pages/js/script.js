@@ -648,6 +648,7 @@ function uploadChunk(file, uploadId, fileHash, chunkSize, show, isResumeCalled) 
     Logger.success("Uploaded " + file.name);
     document.getElementById(uploadId).remove();
     retrieveFile(currentDir);
+    activeChunkStatus();
     return;
   }
   let chunk = file.slice(start, start + chunkSize);
@@ -708,6 +709,7 @@ function uploadChunk(file, uploadId, fileHash, chunkSize, show, isResumeCalled) 
         Logger.success("Uploaded " + file.name);
         document.getElementById(uploadId).remove();
         retrieveFile(currentDir);
+        activeChunkStatus();
       }
     }
   };
@@ -783,16 +785,16 @@ async function createFolder(name, dir = "") {
       `./file-operations?method=mkdirf&parent=${dir}&folder=${name}`
     );
     const data = await resp.json();
-      console.log(data);
-      if (data.status === "success" && data.exists == false) {
-        return true;
-      }
-      else if (data.exists == true) {
-        Logger.failure("Folder already exist");
-        return false;
-      }
-      Logger.failure("Error creating folder");
+    console.log(data);
+    if (data.status === "success" && data.exists == false) {
+      return true;
+    }
+    else if (data.exists == true) {
+      Logger.failure("Folder already exist");
       return false;
+    }
+    Logger.failure("Error creating folder");
+    return false;
 
   } catch (err) {
     console.error(err);
@@ -863,12 +865,51 @@ async function startFolderUpload(chunksize) {
 async function createRequiredFolders(filePath, currDir) {
   let splitFolders = filePath.split("/");
   let finished = "";
-    for (let i = 0; i < splitFolders.length; i++) {
-      let folder = splitFolders[i];
-      if (!folderss.includes(finished + folder)) {
-        await createFolder(folder, currDir + "/" + finished);
-        folderss.push(finished + folder);
+  for (let i = 0; i < splitFolders.length; i++) {
+    let folder = splitFolders[i];
+    if (!folderss.includes(finished + folder)) {
+      await createFolder(folder, currDir + "/" + finished);
+      folderss.push(finished + folder);
     }
     finished += folder + "/";
   };
+}
+
+function activeChunkStatus() {
+  fetch("./operations-status?method=list")
+    .then((resp) => resp.json())
+    .then((data) => {
+      console.log(data);
+      data.data.forEach(element => {
+        if (element.completed <= 100) {
+          let parentDiv = document.createElement("div");
+          parentDiv.classList.add("parentCont", "running-border");
+          parentDiv.id = uploadId;
+          let div = document.createElement("div");
+          div.className = "progress-header";
+          let fileNameSpan = document.createElement("span");
+          fileNameSpan.className = "file-name";
+          let percentSpan = document.createElement("span");
+          percentSpan.className = "percent";
+          percentSpan.id = uploadId + "P";
+          let progressbar = document.createElement("div");
+          progressbar.id = uploadId + "PB";
+          progressbar.className = "progress-bar"
+
+          parentDiv.appendChild(progressbar);
+
+          let infoDiv = document.createElement("div");
+          infoDiv.className = "progress-info";
+          let sizeSpan = document.createElement("span");
+          sizeSpan.className = "size";
+          sizeSpan.id = uploadId + "S";
+
+          div.append(fileNameSpan, percentSpan);
+          infoDiv.append(sizeSpan);
+          parentDiv.append(div, infoDiv);
+          fileNameSpan.innerText = element.fileName;
+          document.getElementById("chunkBar").append(parentDiv);
+        }
+      });
+    })
 }

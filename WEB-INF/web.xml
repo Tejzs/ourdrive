@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" version="3.1">
 
+    <listener>
+        <listener-class>init.AppContextListener</listener-class>
+    </listener>
+
     <!-- Start of ilters/AuthenticationFilter -->
     <filter>
         <filter-name>authenticationfilter</filter-name>
@@ -77,4 +81,15 @@
         <url-pattern>/file-operations</url-pattern>
     </servlet-mapping>
     <!-- End of ervlets/FileOperations -->
+
+    <!-- Start of ervlets/OperationsStatusServlet -->
+    <servlet>
+        <servlet-name>operationsstatusservlet</servlet-name>
+        <servlet-class>servlets.OperationsStatusServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>operationsstatusservlet</servlet-name>
+        <url-pattern>/operations-status</url-pattern>
+    </servlet-mapping>
+    <!-- End of ervlets/OperationsStatusServlet -->
 </web-app>

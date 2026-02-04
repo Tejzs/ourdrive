@@ -21,7 +21,8 @@ import org.json.JSONObject;
 import utility.*;
 import utility.file.FileChunker;
 import meta.FileUploadMeta;
-import storage.InMemoryStoreHandler;
+import operations.FileOperations;
+import storage.DataStorage;
 
 @MultipartConfig(
     fileSizeThreshold = 0,
@@ -68,7 +69,7 @@ public class ChunkUploadServlet extends HttpServlet {
 
         String uploadId = fileUploadMeta.getUploadId();
 
-        InMemoryStoreHandler.getFileUploadMetaStore().offer(uploadId, fileUploadMeta);
+        DataStorage.getFileUploadMetaStore().offer(uploadId, fileUploadMeta);
         Utils.sendSuccessResp(out, new JSONObject().put("uploadId", uploadId));
     }
 
@@ -87,7 +88,7 @@ public class ChunkUploadServlet extends HttpServlet {
         int chunkIndex = Integer.parseInt(req.getParameter("chunkIndex"));
 
         FileUploadMeta fileUploadMeta = null;
-        if ((fileUploadMeta = (FileUploadMeta) InMemoryStoreHandler.getFileUploadMetaStore().get(uploadId)) == null) {
+        if ((fileUploadMeta = (FileUploadMeta) DataStorage.getFileUploadMetaStore().get(uploadId)) == null) {
             Utils.sendFailureResp(out, new JSONObject(), "Upload id does not exist");
             return;
         }
@@ -127,26 +128,26 @@ public class ChunkUploadServlet extends HttpServlet {
         chunkIndex++;
 
         if (chunkIndex == fileUploadMeta.getTotalChunks()) {
-            InMemoryStoreHandler.getFileUploadMetaStore().delete(uploadId);
+            DataStorage.getFileUploadMetaStore().delete(uploadId);
             String filename = Utils.getNonDuplicateFileName(storePath, fileUploadMeta.getFilename());
-            mergeChunks(new File(storePath + File.separatorChar + filename), uploadDir);
+            mergeChunks(storePath + File.separatorChar + filename, uploadDir.getAbsolutePath());
             return;
         }
 
         fileUploadMeta.setChunksConsumed(chunkIndex);
         resp.setStatus(HttpServletResponse.SC_OK);
-        Utils.sendSuccessResp(out, new JSONObject());
     }
 
-    private void mergeChunks(File newFile, File tempDir)
+    private void mergeChunks(String newFile, String tempDir)
             throws IOException {
 
-        FileChunker fileChunker = new FileChunker(tempDir, newFile);
-        fileChunker.assembleChunksFromFolder();
+        FileOperations.startUnChunkingFolder(tempDir, newFile);
+        // FileChunker fileChunker = new FileChunker(tempDir, newFile);
+        // fileChunker.assembleChunksFromFolder();
 
-        for (File f : tempDir.listFiles()) {
-            f.delete();
-        }
-        tempDir.delete();
+        // for (File f : tempDir.listFiles()) {
+        //     f.delete();
+        // }
+        // tempDir.delete();
     }
 }

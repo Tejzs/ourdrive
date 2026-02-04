@@ -13,11 +13,20 @@ import java.util.Comparator;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
+import meta.FileOperationsMeta;
+import operations.FileOperations;
+import storage.DataStorage;
+import utility.*;
+
 
 public class FileChunker {
-    File file;
-    File res;
-    public FileChunker(File file, File res) {
+    private Logger log = Utils.getLogger("FileChunker");
+    private File file;
+    private File res;
+    private FileOperationsMeta meta;
+
+    public FileChunker(File file, File res, FileOperationsMeta meta) {
+        this.meta = meta;
         this.file = file;
         this.res = res;
 
@@ -27,6 +36,7 @@ public class FileChunker {
     }
     
     public void chunkFileToSize(DataSize chunkSize) {
+
         if (!res.exists()) {
             try {
                 res.createNewFile();
@@ -44,13 +54,13 @@ public class FileChunker {
             out.closeEntry();
 
             long chunkLength = chunkSize.getSize();
-            int chunkNum = 0;
-
+            int chunkNum = 0;           
             long bytesRead = 0L;
             while (true) { 
                 if (bytesRead == 0) {
                     bytesRead = 0L;
                     ZipEntry chunkEntry = new ZipEntry(filename + "/chunk_" + ++chunkNum + ".dat");
+
                     out.putNextEntry(chunkEntry);
                 }
 
@@ -81,7 +91,7 @@ public class FileChunker {
         ) {
             in.getNextEntry();
             while (in.getNextEntry() != null) {
-                writeToStream(in, out);
+                writeToStream(in, out, 0, 0L, 0);
                 in.closeEntry();
             }
         } catch (Exception e) {
@@ -157,21 +167,31 @@ public class FileChunker {
         try (
             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(res))
         ) {
+            int chunkNum = 0;
             for (File chunk : chunks) {
                 try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(chunk))) {
-                    writeToStream(in, out);
+                    writeToStream(in, out, chunkNum++, chunk.length() + 1, chunks.length);
                 }
             }
+            meta.setPercentFinished(100);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private void writeToStream(InputStream in, OutputStream out) throws IOException {
+    private void writeToStream(InputStream in, OutputStream out, int chunkNum, long chunkSize, int totalChunks) throws IOException {
 		int byt;
+        long completed = 0L;
+
 		while ((byt = in.read()) != -1) {
+            completed++;
 			out.write(byt);
+            if (completed % 50_00_000 == 0) {
+                meta.setPercentFinished((int) ((((chunkNum * chunkSize) + completed) * 100) / (totalChunks * chunkSize)));
+            }
 		}
+
+        meta.setPercentFinished((int) (((((chunkNum + 1)  * chunkSize)) * 100) / (totalChunks * chunkSize)));
 	}
 
     public static class DataSize {
