@@ -457,6 +457,7 @@ function getActiveTasks() {
         startBtn.innerHTML = "Resume";
         startBtn.className = "start-btn";
 
+        parentDiv.appendChild(progressbar);
 
         startBtn.onclick = () => {
           resumeUpload(file.uploadId, file.chunksconsumed, file.filesize, file.chunksize, parentDiv);

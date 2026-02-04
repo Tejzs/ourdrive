@@ -53,9 +53,12 @@
         <label class="file-upload">
           <span>Share</span>
         </label>
+        <label class="file-upload">
+          <span onclick="openModal()">Compress</span>
+        </label>
         <label class="new-folder">
           <span onclick="newFolder()">New Folder</span>
-          <input id="folderInput" class="folder-input" type="text" placeholder="Enter Folder Name"/>
+          <input id="folderInput" class="folder-input" type="text" placeholder="Enter Folder Name" />
         </label>
       </div>
       <div class="tableContainer">
@@ -85,6 +88,26 @@
         </div>
       </div>
     </div>
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <button class="modal-close" onclick="closeModal()" aria-label="Close">🗙</button>
+        <h2>Enter Details</h2>
+        <div id="modalFailed" class="loginFailed hidden">
+          <p>Name is required.</p>
+          <p class="x-btn" onclick="closeModalError()">🗙</p>
+        </div>
+        <label for="username">File Name</label>
+        <input type="text" id="fileName" placeholder="File name">
+
+        <label for="level">Level</label>
+        <input type="range" id="level" min="0" max="9" value="0">
+
+        <div class="modal-actions">
+          <button class="confirm-btn" onclick="submitModal()">Confirm</button>
+        </div>
+      </div>
+    </div>
+
   </main>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/build/sha256.min.js"></script>
