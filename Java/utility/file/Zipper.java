@@ -18,16 +18,17 @@ public class Zipper {
     }
 
     private File[] getFiles() {
+        String baseDir = meta.getFileName().split("\"")[0];
         String[] fileNames = meta.getFolderPath().split("\"");
         File[] files = new File[fileNames.length];
         for (int i = 0; i < fileNames.length; i++) {
-            files[i] = new File(fileNames[i]);
+            files[i] = new File(baseDir, fileNames[i]);
         }
         return files;
     }
 
     private File getZipOutput() {
-        return new File(meta.getFileName());
+        return new File(meta.getFileName().replace("\"", File.separatorChar + ""));
     }
 
     public void zipFiles() throws IOException {

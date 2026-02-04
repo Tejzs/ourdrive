@@ -973,7 +973,7 @@ function submitModal() {
   console.log("Name:", name);
   console.log("Level:", level);
 
-  createZip(fileName, level);
+  createZip(name, level);
 
   closeModal();
 }
@@ -982,9 +982,9 @@ function submitModal() {
 function createZip(fileName, level) {
   const checkedCheckboxes = document.querySelectorAll('input[name="fileSelector"]:checked');
   const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
-  console.log(selectedValues.join(','));
+  console.log(selectedValues.join('"'));
 
-  fetch(`./file-operations?method=zip&files=${selectedValues.join("\"")}&name=${fileName}&compression=${level}`)
+  fetch(`./file-operations?method=zip&files=${"/" + selectedValues.join('"')}&name=${fileName}&compression=${level}`)
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {

@@ -12,7 +12,7 @@ public class Properties {
     public static void loadConfigurations() {
         java.util.Properties props = new java.util.Properties();
 
-        try (FileInputStream fis = new FileInputStream("config.properties")) {
+        try (FileInputStream fis = new FileInputStream("/mnt/wwn-0x5000c500c67d4454-part1/Server/apache-tomcat-9.0.98/webapps/FileStorage/WEB-INF/config.properties")) {
             props.load(fis);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -20,8 +20,8 @@ public class Properties {
         DB_USERNAME = props.getProperty("db.user");
         DB_PASSWORD = props.getProperty("db.pass");
         DB_HOST = props.getProperty("db.host");
-        DB_PORT = props.getProperty("db");
-        LOG_PATH = props.getProperty("log/path");
+        DB_PORT = props.getProperty("db.port");
+        LOG_PATH = props.getProperty("log.path");
     }
 
 
