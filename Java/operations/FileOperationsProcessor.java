@@ -83,6 +83,8 @@ public class FileOperationsProcessor implements Runnable {
                         break;
                 }
                 meta.setProcessState(ProcessState.COMPLETED);
+                Thread.sleep(3000);
+                DataStorage.getFileOperationsMetaStore().delete(meta.getTaskId());
             } catch (Exception e) {
                 e.printStackTrace();
                 meta.setProcessState(ProcessState.FAILED);
