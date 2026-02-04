@@ -30,7 +30,7 @@ public class Utils {
         return str == null || str.length() == 0;
     }
 
-    public static Logger getLogger(String  className) {
+    public static Logger getLogger(String className) {
         return new Logger(className);
     }
 
