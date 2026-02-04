@@ -20,17 +20,15 @@ public class FileOperationsProcessor implements Runnable {
         while (true) {
             try {
                 Thread.sleep(3000);
+                if (threadUsed.get() > 3) {
+                    return;
+                }
+
+                for (FileOperationsMeta meta : getUnstartedMeta()) {
+                    new Thread(new ProcessMetaData(meta)).start();
+                }
             } catch (Exception e) {
                 e.printStackTrace();
-                continue;
-            }
-
-            if (threadUsed.get() > 3) {
-                return;
-            }
-
-            for (FileOperationsMeta meta : getUnstartedMeta()) {
-                new Thread(new ProcessMetaData(meta)).start();
             }
         }
     }
@@ -40,6 +38,9 @@ public class FileOperationsProcessor implements Runnable {
 
         for (Serializable meta : DataStorage.getFileOperationsMetaStore().values()) {
             FileOperationsMeta operationMeta = (FileOperationsMeta) meta;
+            if (meta == null) {
+                continue;
+            }
 
             if (operationMeta.getProcessState().equals(ProcessState.NOT_STARTED)) {
                 unstartedMetas.add(operationMeta);
@@ -79,6 +80,11 @@ public class FileOperationsProcessor implements Runnable {
             }
 
             meta.setProcessState(ProcessState.COMPLETED);
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             DataStorage.getFileOperationsMetaStore().delete(meta.getTaskId());
         }
     }
