@@ -1,12 +1,14 @@
 package mysql;
 
+import config.Properties;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class SqlConnectionFactory {
-    private static final String DB_URL = "jdbc:mysql://localhost:3306/FileStorageDB";
-    private static final String DB_USER = "root";
-    private static final String DB_PASS = System.getenv("MYSQLDB_PASSWORD");;
+    private static final String DB_URL = "jdbc:mysql://" + Properties.getDbHost() + ":" + Properties.getDbPort() + "/FileStorageDB";
+    private static final String DB_USER = Properties.getDbUsername();
+    private static final String DB_PASS = Properties.getDbPassword();
 
     private static Connection createConnection() throws Exception {
         Class.forName("com.mysql.cj.jdbc.Driver");
