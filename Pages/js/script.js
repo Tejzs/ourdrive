@@ -941,3 +941,58 @@ function activeFileOperationStatus() {
 function checkChunkStatus() {
   activeFileOperationStatus();
 }
+
+const modal = document.getElementById("modalOverlay");
+const slider = document.getElementById("level");
+const sliderValue = document.getElementById("levelValue");
+
+function closeModal() {
+  modal.style.display = "none";
+}
+
+function openModal() {
+  modal.style.display = "flex";
+}
+
+function closeModalError() {
+  document.getElementById("modalFailed").classList.add("hidden");
+}
+
+function submitModal() {
+  const nameInput = document.getElementById("fileName");
+  const name = nameInput.value.trim();
+  const level = slider.value;
+
+  if (!name) {
+    document.getElementById("modalFailed").classList.remove("hidden");
+    nameInput.focus();
+    return;
+  }
+
+  // success path
+  console.log("Name:", name);
+  console.log("Level:", level);
+
+  createZip(fileName, level);
+
+  closeModal();
+}
+
+
+function createZip(fileName, level) {
+  const checkedCheckboxes = document.querySelectorAll('input[name="fileSelector"]:checked');
+  const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
+  console.log(selectedValues.join(','));
+
+  fetch(`./file-operations?method=zip&files=${selectedValues.join("\"")}&name=${fileName}&compression=${level}`)
+    .then((resp) => resp.json())
+    .then((data) => {
+      if (data.status == "success") {
+        Logger.success("Successfully deleted");
+        retrieveFile(currentDir);
+      } else {
+        Logger.failure("Error deleting file/files");
+      }
+    });
+
+}
