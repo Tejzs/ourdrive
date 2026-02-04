@@ -33,9 +33,8 @@ public class OperationsStatusServlet extends HttpServlet {
             case "list":
                 for (Entry<Object, Serializable> entry : DataStorage.getFileOperationsMetaStore().getEntrySet()) {
                     FileOperationsMeta meta = (FileOperationsMeta) entry.getValue();
-                    Utils.getLogger(CLASS_NAME).log(meta.toJson());
 
-                    if (!meta.getInitiator().equals(mail)) {
+                    if (meta == null || !meta.getInitiator().equals(mail)) {
                         continue;
                     }
 

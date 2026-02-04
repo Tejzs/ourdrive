@@ -607,6 +607,13 @@ function formatSpeed(bytesPerSec) {
   return bytesPerSec.toFixed(2) + " B/s";
 }
 
+let operationIntervalTime;
+
+function changeIntervalTime(t) {
+  clearInterval(operationIntervalID);
+  operationIntervalID = setInterval(activeFileOperationStatus, t);
+  operationIntervalTime = t;
+}
 
 function uploadChunk(file, uploadId, fileHash, chunkSize, show, isResumeCalled) {
   if (file.length != 0 && show == false) {
@@ -647,8 +654,8 @@ function uploadChunk(file, uploadId, fileHash, chunkSize, show, isResumeCalled) 
   if (start >= file.size) {
     Logger.success("Uploaded " + file.name);
     document.getElementById(uploadId).remove();
-    retrieveFile(currentDir);
-    activeChunkStatus();
+    activeFileOperationStatus();
+    changeIntervalTime(500);
     return;
   }
   let chunk = file.slice(start, start + chunkSize);
@@ -708,8 +715,8 @@ function uploadChunk(file, uploadId, fileHash, chunkSize, show, isResumeCalled) 
       if (start >= file.size) {
         Logger.success("Uploaded " + file.name);
         document.getElementById(uploadId).remove();
-        retrieveFile(currentDir);
-        activeChunkStatus();
+        activeFileOperationStatus();
+        changeIntervalTime(500);
       }
     }
   };
@@ -875,25 +882,36 @@ async function createRequiredFolders(filePath, currDir) {
   };
 }
 
-function activeChunkStatus() {
+let operationIntervalID = null;
+
+function activeFileOperationStatus() {
   fetch("./operations-status?method=list")
     .then((resp) => resp.json())
     .then((data) => {
-      console.log(data);
-      data.data.forEach(element => {
-        if (element.completed <= 100) {
+      document.getElementById("chunkStatus").innerHTML = "";
+      if (data.data) {
+        console.log(data);
+        if (data.data.length == 0 && operationIntervalTime != 30000) {
+          changeIntervalTime(30000);
+        } else if (data.data.length == 0 && operationIntervalTime == 30000) {
+          return;
+        } else if (operationIntervalTime != 500) {
+          changeIntervalTime(500);
+        }
+        data.data.forEach(element => {
+          console.log(element.completed)
           let parentDiv = document.createElement("div");
           parentDiv.classList.add("parentCont", "running-border");
-          parentDiv.id = uploadId;
+          parentDiv.id = element.taskId;
           let div = document.createElement("div");
           div.className = "progress-header";
           let fileNameSpan = document.createElement("span");
           fileNameSpan.className = "file-name";
           let percentSpan = document.createElement("span");
           percentSpan.className = "percent";
-          percentSpan.id = uploadId + "P";
+          percentSpan.id = element.taskId + "P";
           let progressbar = document.createElement("div");
-          progressbar.id = uploadId + "PB";
+          progressbar.id = element.taskId + "PB";
           progressbar.className = "progress-bar"
 
           parentDiv.appendChild(progressbar);
@@ -902,14 +920,23 @@ function activeChunkStatus() {
           infoDiv.className = "progress-info";
           let sizeSpan = document.createElement("span");
           sizeSpan.className = "size";
-          sizeSpan.id = uploadId + "S";
+          sizeSpan.id = element.taskId + "S";
 
           div.append(fileNameSpan, percentSpan);
           infoDiv.append(sizeSpan);
           parentDiv.append(div, infoDiv);
-          fileNameSpan.innerText = element.fileName;
-          document.getElementById("chunkBar").append(parentDiv);
-        }
-      });
+          fileNameSpan.innerText = element.fileName.substring(element.fileName.lastIndexOf('/') + 1, element.fileName.length);
+          document.getElementById("chunkStatus").append(parentDiv);
+          document.getElementById(element.taskId + "S").innerText = element.taskName + " | " + element.state;
+          document.getElementById(element.taskId + "PB").style.right = (100 - element.completed) + "%";
+          if (element.completed == 100) {
+            retrieveFile(currentDir);
+          }
+        });
+      }
     })
+}
+
+function checkChunkStatus() {
+  activeFileOperationStatus();
 }
