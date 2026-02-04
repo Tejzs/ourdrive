@@ -77,7 +77,9 @@ public class FileOperationsProcessor implements Runnable {
                 default:
                     break;
             }
+
             meta.setProcessState(ProcessState.COMPLETED);
+            DataStorage.getFileOperationsMetaStore().delete(meta.getTaskId());
         }
     }
 }
