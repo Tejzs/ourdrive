@@ -6,11 +6,11 @@ import org.json.JSONObject;
 
 public class FileOperationsMeta implements Serializable {
 
-    public static enum TaskName {
-        CHUNK_TO_FOLDER, UNCHUNK_FROM_FOLDER, CHUNK_TO_ZIP, UNCHUNK_FROM_ZIP, ZIP, UNZIP;
+    public enum TaskName {
+        CHUNK_TO_FOLDER, UNCHUNK_FROM_FOLDER, CHUNK_TO_ZIP, UNCHUNK_FROM_ZIP, ZIP;
     }
 
-    public static enum ProcessState {
+    public enum ProcessState {
         NOT_STARTED, PROCESSING, COMPLETED, FAILED;
     }
 

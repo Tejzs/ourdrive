@@ -12,6 +12,7 @@ import meta.FileOperationsMeta.ProcessState;
 import storage.DataStorage;
 import utility.Utils;
 import utility.file.FileChunker;
+import utility.file.Zipper;
 
 public class FileOperationsProcessor implements Runnable {
     private AtomicInteger threadUsed = new AtomicInteger();
@@ -62,22 +63,29 @@ public class FileOperationsProcessor implements Runnable {
 
         @Override
         public void run() {
-            TaskName task = meta.getTaskName();
+            try {
+                TaskName task = meta.getTaskName();
 
-            String newFileNameOrPath = meta.getFileName();
-            String filePath = meta.getFolderPath();
+                String newFileNameOrPath = meta.getFileName();
+                String filePath = meta.getFolderPath();
 
-            meta.setProcessState(ProcessState.PROCESSING);
-            switch (task) {
-                case UNCHUNK_FROM_FOLDER:
-                    Utils.getLogger("FileOperationsProcessor").log("Processing unchunk. ", meta.getTaskId());
-                    new FileChunker(new File(filePath), new File(newFileNameOrPath), meta).assembleChunksFromFolder();
-                    break;
-
-                default:
-                    break;
+                meta.setProcessState(ProcessState.PROCESSING);
+                switch (task) {
+                    case UNCHUNK_FROM_FOLDER:
+                        Utils.getLogger("FileOperationsProcessor").log("Processing unchunk. ", meta.getTaskId());
+                        new FileChunker(new File(filePath), new File(newFileNameOrPath), meta).assembleChunksFromFolder();
+                        break;
+                    case ZIP:
+                        new Zipper(meta).zipFiles();
+                        break;
+                    default:
+                        break;
+                }
+                meta.setProcessState(ProcessState.COMPLETED);
+            } catch (Exception e) {
+                e.printStackTrace();
+                meta.setProcessState(ProcessState.FAILED);
             }
-            meta.setProcessState(ProcessState.COMPLETED);
         }
     }
 }

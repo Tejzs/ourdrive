@@ -16,6 +16,13 @@ public class FileOperations {
         return taskId;
     }
 
+    public static String startZippingFiles(String file, String files, int compression) {
+        String mail = SessionData.getThreadLocalSessionData().getMail();
+        String taskId = generateUploadId(file);
+        DataStorage.getFileOperationsMetaStore().offer(taskId, new FileOperationsMeta(file, 0L, compression, taskId, files, TaskName.ZIP, mail));
+        return taskId;
+    }
+
     private static String generateUploadId(String fileName) {
         long time = System.currentTimeMillis();
         return utility.Utils.hashHex(time + fileName);
