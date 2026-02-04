@@ -135,7 +135,8 @@ public class ChunkUploadServlet extends HttpServlet {
         }
 
         fileUploadMeta.setChunksConsumed(chunkIndex);
-        resp.setStatus(HttpServletResponse.SC_OK);
+        // resp.setStatus(HttpServletResponse.SC_OK);
+        Utils.sendSuccessResp(out, new JSONObject());
     }
 
     private void mergeChunks(String newFile, String tempDir)

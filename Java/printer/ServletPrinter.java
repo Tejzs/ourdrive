@@ -7,7 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 
 public class ServletPrinter {
-    private static final String LOG_FILE = "/home/tejas/Projects/apache-tomcat-9.0.98/webapps/FileStorage/Log/log.log";
+    private static final String LOG_FILE = "/mnt/wwn-0x5000c500c67d4454-part1/Server/apache-tomcat-9.0.98/webapps/FileStorage/Log/log.log";
 
     File file;
     String className;
