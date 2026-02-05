@@ -275,7 +275,6 @@ input {
   transform: scale(0.98);
 }
 
-
 .main {
   display: grid;
   grid-template-areas:
@@ -805,4 +804,37 @@ label.start-btn {
 .usage {
   margin-left: 15px;
   font-size: 15px;
+}
+
+.usage {
+  margin-left: 15px;
+  font-size: 15px;
+}
+
+.download {
+  flex-shrink: 0;
+}
+
+.download a {
+  font-size: 10px;
+  background: #222;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 5px;
+  border: 1px solid #444;
+  transition: all 0.2s ease;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.download:hover a {
+  background: #2f2f2f;
+  border-color: #666;
+}
+
+.download:active a {
+  background: #111;
+  transform: scale(0.98);
 }

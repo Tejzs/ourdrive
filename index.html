@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
+  <title>OurDrive</title>
   <link rel="stylesheet" href="./Pages/Style/styles.css" />
 </head>
 
@@ -48,9 +48,6 @@
           <span onclick="deleteSelected()">Delete</span>
         </label>
         <label class="file-upload">
-          <span>Download</span>
-        </label>
-        <label class="file-upload">
           <span>Share</span>
         </label>
         <label class="file-upload">
@@ -66,6 +63,7 @@
           <thead>
             <tr>
               <th><input type="checkbox" id="select-all" oninput="selectAll()"></th>
+              <th>Action</th>
               <th id="name">Name ↑</th>
               <th id="type">Type</th>
               <th id="size">Size</th>
