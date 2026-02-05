@@ -19,7 +19,7 @@ public class FileAccessFilter extends HttpFilter {
         String mail = SessionData.getThreadLocalSessionData().getMail();
 
         if (!requestURI.substring(0, requestURI.indexOf("/")).equals(mail)) {
-            servletResponse.sendRedirect("Pages/unauthorized");
+            servletResponse.sendRedirect("/FileStorage/Pages/unauthorized.html");
         }
 
         filterChain.doFilter(servletRequest, servletResponse);
