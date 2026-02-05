@@ -457,6 +457,7 @@ function getActiveTasks() {
         startBtn.innerHTML = "Resume";
         startBtn.className = "start-btn";
 
+        parentDiv.appendChild(progressbar);
 
         startBtn.onclick = () => {
           resumeUpload(file.uploadId, file.chunksconsumed, file.filesize, file.chunksize, parentDiv);
@@ -753,9 +754,12 @@ function getOptimalChunkSize(fileSize) {
 function deleteSelected() {
   const checkedCheckboxes = document.querySelectorAll('input[name="fileSelector"]:checked');
   const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
-  console.log(selectedValues.join(','));
+  if (selectedValues.length == 0) {
+    Logger.failure("Nothing to delete");
+    return;
+  }  
 
-  fetch(`./file-operations?method=delete&parent=${currentDir}&files=${selectedValues.join(",").replaceAll("&", "%26")}`)
+  fetch(`./file-operations?method=delete&parent=${currentDir}&files=${selectedValues.join('"').replaceAll("&", "%26")}`)
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {
@@ -781,7 +785,9 @@ function newFolder() {
           Logger.failure("Error creating folder");
         }
       });
-
+  }
+  else {
+    Logger.failure("Failed to create new folder"); 
   }
 }
 
@@ -890,7 +896,6 @@ function activeFileOperationStatus() {
     .then((data) => {
       document.getElementById("chunkStatus").innerHTML = "";
       if (data.data) {
-        console.log(data);
         if (data.data.length == 0 && operationIntervalTime != 30000) {
           changeIntervalTime(30000);
         } else if (data.data.length == 0 && operationIntervalTime == 30000) {
@@ -899,7 +904,6 @@ function activeFileOperationStatus() {
           changeIntervalTime(500);
         }
         data.data.forEach(element => {
-          console.log(element.completed)
           let parentDiv = document.createElement("div");
           parentDiv.classList.add("parentCont", "running-border");
           parentDiv.id = element.taskId;
@@ -927,7 +931,7 @@ function activeFileOperationStatus() {
           parentDiv.append(div, infoDiv);
           fileNameSpan.innerText = element.fileName.substring(element.fileName.lastIndexOf('/') + 1, element.fileName.length);
           document.getElementById("chunkStatus").append(parentDiv);
-          document.getElementById(element.taskId + "S").innerText = element.taskName + " | " + element.state;
+          document.getElementById(element.taskId + "S").innerText = element.taskName + " | " + element.state + " | " + element.completed + "%";
           document.getElementById(element.taskId + "PB").style.right = (100 - element.completed) + "%";
           if (element.completed == 100) {
             retrieveFile(currentDir);
@@ -939,4 +943,62 @@ function activeFileOperationStatus() {
 
 function checkChunkStatus() {
   activeFileOperationStatus();
+}
+
+const modal = document.getElementById("modalOverlay");
+const slider = document.getElementById("level");
+const sliderValue = document.getElementById("levelValue");
+
+function closeModal() {
+  modal.style.display = "none";
+}
+
+let checkedCheckboxes;
+let selectedValues;
+
+function openModal() {
+  checkedCheckboxes = document.querySelectorAll('input[name="fileSelector"]:checked');
+  selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
+  if (selectedValues.length == 0) {
+    Logger.failure("Nothing to compress");
+    return;
+  }
+
+  modal.style.display = "flex";
+}
+
+function closeModalError() {
+  document.getElementById("modalFailed").classList.add("hidden");
+}
+
+function submitModal() {
+  const nameInput = document.getElementById("fileName");
+  const name = nameInput.value.trim();
+  const level = slider.value;
+
+  if (!name) {
+    document.getElementById("modalFailed").classList.remove("hidden");
+    nameInput.focus();
+    return;
+  }
+
+  createZip(name, level, selectedValues);
+  closeModal();
+}
+
+
+function createZip(fileName, level, selectedValues) {
+  fetch(`./file-operations?method=zip&parent=${currentDir+"/"}&files=${currentDir + "/" + selectedValues.join('"' + currentDir + "/")}&name=${fileName+".zip"}&compression=${level}`)
+    .then((resp) => resp.json())
+    .then((data) => {
+      if (data.status == "success") {
+        Logger.success("Successfully Compressed");
+        activeFileOperationStatus();
+        changeIntervalTime(500);
+
+      } else {
+        Logger.failure("Error compressing file/files");
+      }
+    });
+
 }

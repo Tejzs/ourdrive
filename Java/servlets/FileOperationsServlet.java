@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import meta.FileOperationsMeta;
+import operations.FileOperations;
 import org.json.JSONObject;
 
 import utility.SessionData;
@@ -30,6 +32,7 @@ public class FileOperationsServlet extends HttpServlet {
         String mail = SessionData.getThreadLocalSessionData().getMail();
         String method = request.getParameter("method");
 
+        String zipname;
         String parentDir;
         String folderName;
         String[] files;
@@ -58,9 +61,12 @@ public class FileOperationsServlet extends HttpServlet {
 
             case "delete":
                 parentDir = baseDir + File.separatorChar + mail + File.separatorChar + request.getParameter("parent");
-                files = request.getParameter("files").split("|");
+                files = request.getParameter("files").split("\"");
 
                 for (String fileName : files) {
+                    if (fileName.equals("/")) {
+                        continue;
+                    }
                     File file = new File(parentDir, fileName);
 
                     if (!file.exists()) {
@@ -75,6 +81,15 @@ public class FileOperationsServlet extends HttpServlet {
                     }
 
                 }
+                Utils.sendSuccessResp(out, output);
+                break;
+
+            case "zip":
+                parentDir = request.getParameter("parent");
+                String filesStr = request.getParameter("files");
+                zipname = request.getParameter("name");
+                int compression = Integer.parseInt(request.getParameter("compression"));
+                FileOperations.startZippingFiles(baseDir + File.separatorChar + mail + "\"" + parentDir + zipname, filesStr, compression);
                 Utils.sendSuccessResp(out, output);
                 break;
 
