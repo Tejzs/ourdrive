@@ -103,4 +103,15 @@
         <url-pattern>/operations-status</url-pattern>
     </servlet-mapping>
     <!-- End of ervlets/OperationsStatusServlet -->
+
+    <!-- Start of ervlets/OperationsStatusServlet -->
+    <servlet>
+        <servlet-name>shareServlet</servlet-name>
+        <servlet-class>servlets.ShareServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>shareServlet</servlet-name>
+        <url-pattern>/share</url-pattern>
+    </servlet-mapping>
+    <!-- End of ervlets/OperationsStatusServlet -->
 </web-app>
