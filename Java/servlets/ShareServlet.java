@@ -26,7 +26,7 @@ public class ShareServlet extends HttpServlet {
             switch (method) {
                 case "create":
                     AccessibilityHandler.getInstance().registerAccessCode(code, folder, mail);
-                    Utils.sendSuccessResp(out, new JSONObject("code", code));
+                    Utils.sendSuccessResp(out, new JSONObject().put("code", code));
                     break;
                 case "list":
                     Utils.sendSuccessResp(out, AccessibilityHandler.getInstance().listAccessibleFolders(mail));
@@ -50,6 +50,7 @@ public class ShareServlet extends HttpServlet {
 
         try {
             AccessibilityHandler.getInstance().useAccessCode(code, mail);
+            Utils.sendSuccessResp(out, new JSONObject());
         } catch (RuntimeException e) {
             Utils.sendFailureResp(out, new JSONObject(), e.getMessage());
         } catch (Exception e) {

@@ -28,7 +28,7 @@ public class AccessibilityHandler {
     }
 
     public void useAccessCode(String code, String mail) throws SQLException {
-        PreparedStatement pstmt = con.prepareStatement("SELECT owner ShareRecords WHERE shareid = ?");
+        PreparedStatement pstmt = con.prepareStatement("SELECT owner FROM ShareRecords WHERE shareid = ?");
         pstmt.setString(1, code);
         ResultSet rs = pstmt.executeQuery();
 
@@ -50,6 +50,9 @@ public class AccessibilityHandler {
 
         if (rs.next()) {
             String currCodes = rs.getString("contents");
+            if (currCodes.contains(code)) {
+                return;
+            }
             currCodes += "," + code;
             pstmt = con.prepareStatement("UPDATE AccessibleContent SET contents = ? WHERE mail = ?");
             pstmt.setString(1, currCodes);
@@ -59,11 +62,12 @@ public class AccessibilityHandler {
             pstmt = con.prepareStatement("INSERT INTO AccessibleContent VALUES (?, ?)");
             pstmt.setString(1, mail);
             pstmt.setString(2, code);
+            pstmt.executeUpdate();
         }
     }
 
     public String getPathForCode(String code) throws SQLException {
-        PreparedStatement pstmt = con.prepareStatement("SELECT owner, folder ShareRecords WHERE shareid = ?");
+        PreparedStatement pstmt = con.prepareStatement("SELECT owner, folder FROM ShareRecords WHERE shareid = ?");
         pstmt.setString(1, code);
         ResultSet rs = pstmt.executeQuery();
 
