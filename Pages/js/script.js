@@ -198,6 +198,21 @@ function renderTable(files, tbody) {
     const tr = document.createElement("tr");
     const tdcb = document.createElement("td");
     const cb = document.createElement("input");
+
+    const tdDown = document.createElement("td");
+
+    const dLabel = document.createElement("label");
+    dLabel.className = "download";
+    const dA = document.createElement("a");
+    dA.href = `./Files/tejasvishnusv@gmail.com/${encodeURIComponent(file.name)}`;
+    dA.download = file.name;
+    dA.innerHTML = `
+    <svg width="16" height="16" viewBox="0 0 16 16"
+        xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+      <path d="M12 13.5C12 13.776 11.776 14 11.5 14H3.5C3.224 14 3 13.776 3 13.5C3 13.224 3.224 13 3.5 13H11.5C11.776 13 12 13.224 12 13.5ZM7.146 11.854C7.341 12.049 7.658 12.049 7.853 11.854L11.853 7.854C12.048 7.659 12.048 7.342 11.853 7.147C11.658 6.952 11.341 6.952 11.146 7.147L8 10.294V1.5C8 1.224 7.776 1 7.5 1C7.224 1 7 1.224 7 1.5V10.293L3.854 7.146C3.659 6.951 3.342 6.951 3.147 7.146C2.952 7.341 2.952 7.658 3.147 7.853L7.147 11.853Z"/>
+    </svg>`;
+    dLabel.append(dA);
+
     const tdName = document.createElement("td");
     tdName.className = "rClick";
     const tdKind = document.createElement("td");
@@ -215,12 +230,14 @@ function renderTable(files, tbody) {
     tdDate.textContent = file.lastMod;
     tdShared.textContent = file.owner;
     tdcb.append(cb);
+    tdDown.append(dLabel);
     cb.type = "checkbox";
     cb.name = "fileSelector";
     cb.id = "select-all";
     cb.className = "fileSelector";
     cb.value = file.name;
-    tr.append(tdcb, tdName, tdKind, tdSize, tdDate, tdShared);
+    const emptyTd = document.createElement("td");
+    file.type == "folder" ?  tr.append(tdcb, emptyTd ,tdName, tdKind, tdSize, tdDate, tdShared) : tr.append(tdcb, tdDown, tdName, tdKind, tdSize, tdDate, tdShared);
     tbody.append(tr);
 
     if (file.type == "folder") {
