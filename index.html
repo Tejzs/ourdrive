@@ -87,6 +87,10 @@
           </div>
         </div>
       </div>
+      <div class="usage">
+        <p id="userUsage"></p>
+        <p id="usage"></p>
+      </div>
     </div>
     <div class="modal-overlay" id="modalOverlay">
       <div class="modal">
@@ -119,6 +123,7 @@
     retrieveFile("/");
     getActiveTasks();
     activeFileOperationStatus();
+    getUsage();
   });
 </script>
 

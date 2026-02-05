@@ -801,3 +801,8 @@ label.start-btn {
 .modal-close:active {
   color: hsla(0,0%,100%,.4);
 }
+
+.usage {
+  margin-left: 15px;
+  font-size: 15px;
+}
