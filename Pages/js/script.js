@@ -656,7 +656,7 @@ function uploadChunk(file, uploadId, fileHash, chunkSize, show, isResumeCalled) 
     Logger.success("Uploaded " + file.name);
     document.getElementById(uploadId).remove();
     activeFileOperationStatus();
-    changeIntervalTime(500);
+    changeIntervalTime(1000);
     return;
   }
   let chunk = file.slice(start, start + chunkSize);
@@ -717,7 +717,7 @@ function uploadChunk(file, uploadId, fileHash, chunkSize, show, isResumeCalled) 
         Logger.success("Uploaded " + file.name);
         document.getElementById(uploadId).remove();
         activeFileOperationStatus();
-        changeIntervalTime(500);
+        changeIntervalTime(1000);
       }
     }
   };
@@ -757,13 +757,14 @@ function deleteSelected() {
   if (selectedValues.length == 0) {
     Logger.failure("Nothing to delete");
     return;
-  }  
+  }
 
   fetch(`./file-operations?method=delete&parent=${currentDir}&files=${selectedValues.join('"').replaceAll("&", "%26")}`)
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {
         Logger.success("Successfully deleted");
+        getUsage();
         retrieveFile(currentDir);
       } else {
         Logger.failure("Error deleting file/files");
@@ -780,6 +781,7 @@ function newFolder() {
       .then((data) => {
         if (data.status == "success") {
           Logger.success("Created folder");
+          getUsage();
           retrieveFile(currentDir);
         } else {
           Logger.failure("Error creating folder");
@@ -787,7 +789,7 @@ function newFolder() {
       });
   }
   else {
-    Logger.failure("Failed to create new folder"); 
+    Logger.failure("Failed to create new folder");
   }
 }
 
@@ -834,6 +836,7 @@ function cancelUpload(uploadId) {
 function uploadFolders() {
   let chuckSize = document.getElementById("chunk-size").value;
   startFolderUpload(chuckSize);
+  getUsage();
 }
 
 let folderss = [];
@@ -900,8 +903,8 @@ function activeFileOperationStatus() {
           changeIntervalTime(30000);
         } else if (data.data.length == 0 && operationIntervalTime == 30000) {
           return;
-        } else if (operationIntervalTime != 500) {
-          changeIntervalTime(500);
+        } else if (operationIntervalTime != 1000) {
+          changeIntervalTime(1000);
         }
         data.data.forEach(element => {
           let parentDiv = document.createElement("div");
@@ -935,6 +938,7 @@ function activeFileOperationStatus() {
           document.getElementById(element.taskId + "PB").style.right = (100 - element.completed) + "%";
           if (element.completed == 100) {
             retrieveFile(currentDir);
+            getUsage();
           }
         });
       }
@@ -988,17 +992,41 @@ function submitModal() {
 
 
 function createZip(fileName, level, selectedValues) {
-  fetch(`./file-operations?method=zip&parent=${currentDir+"/"}&files=${currentDir + "/" + selectedValues.join('"' + currentDir + "/")}&name=${fileName+".zip"}&compression=${level}`)
+  fetch(`./file-operations?method=zip&parent=${currentDir + "/"}&files=${currentDir + "/" + selectedValues.join('"' + currentDir + "/")}&name=${fileName + ".zip"}&compression=${level}`)
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {
         Logger.success("Successfully Compressed");
         activeFileOperationStatus();
-        changeIntervalTime(500);
+        changeIntervalTime(1000);
 
       } else {
         Logger.failure("Error compressing file/files");
       }
+    });
+
+}
+
+function getUsage() {
+  fetch(`./user?method=freeSpace`)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error("HTTP error " + response.status);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      console.log(data);
+      if (data.status == "success") {
+        document.getElementById("userUsage").innerText = `${data.currUser}: ${data.userUsed}`
+        document.getElementById("usage").innerText = `Server Storage: ${data.freeSpace} / ${data.totalSpace}`
+      }
+      if (data.status == "failure") {
+        console.log(data.msg);
+      }
+    })
+    .catch((error) => {
+      console.error("Error:", error);
     });
 
 }
