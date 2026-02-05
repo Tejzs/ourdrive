@@ -756,7 +756,7 @@ function deleteSelected() {
   const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
   console.log(selectedValues.join(','));
 
-  fetch(`./file-operations?method=delete&parent=${currentDir}&files=${selectedValues.join(",").replaceAll("&", "%26")}`)
+  fetch(`./file-operations?method=delete&parent=${currentDir}&files=${selectedValues.join('"').replaceAll("&", "%26")}`)
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {
@@ -891,7 +891,6 @@ function activeFileOperationStatus() {
     .then((data) => {
       document.getElementById("chunkStatus").innerHTML = "";
       if (data.data) {
-        console.log(data);
         if (data.data.length == 0 && operationIntervalTime != 30000) {
           changeIntervalTime(30000);
         } else if (data.data.length == 0 && operationIntervalTime == 30000) {
@@ -900,7 +899,6 @@ function activeFileOperationStatus() {
           changeIntervalTime(500);
         }
         data.data.forEach(element => {
-          console.log(element.completed)
           let parentDiv = document.createElement("div");
           parentDiv.classList.add("parentCont", "running-border");
           parentDiv.id = element.taskId;
@@ -928,7 +926,7 @@ function activeFileOperationStatus() {
           parentDiv.append(div, infoDiv);
           fileNameSpan.innerText = element.fileName.substring(element.fileName.lastIndexOf('/') + 1, element.fileName.length);
           document.getElementById("chunkStatus").append(parentDiv);
-          document.getElementById(element.taskId + "S").innerText = element.taskName + " | " + element.state;
+          document.getElementById(element.taskId + "S").innerText = element.taskName + " | " + element.state + " | " + element.completed + "%";
           document.getElementById(element.taskId + "PB").style.right = (100 - element.completed) + "%";
           if (element.completed == 100) {
             retrieveFile(currentDir);
@@ -969,12 +967,7 @@ function submitModal() {
     return;
   }
 
-  // success path
-  console.log("Name:", name);
-  console.log("Level:", level);
-
   createZip(name, level);
-
   closeModal();
 }
 
@@ -984,14 +977,16 @@ function createZip(fileName, level) {
   const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
   console.log(selectedValues.join('"'));
 
-  fetch(`./file-operations?method=zip&files=${"/" + selectedValues.join('"')}&name=${fileName}&compression=${level}`)
+  fetch(`./file-operations?method=zip&parent=${currentDir+"/"}&files=${currentDir + "/" + selectedValues.join('"' + currentDir + "/")}&name=${fileName+".zip"}&compression=${level}`)
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {
-        Logger.success("Successfully deleted");
-        retrieveFile(currentDir);
+        Logger.success("Successfully Compressed");
+        activeFileOperationStatus();
+        changeIntervalTime(500);
+
       } else {
-        Logger.failure("Error deleting file/files");
+        Logger.failure("Error compressing file/files");
       }
     });
 

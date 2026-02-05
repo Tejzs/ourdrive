@@ -85,10 +85,11 @@ public class FileOperationsServlet extends HttpServlet {
                 break;
 
             case "zip":
+                parentDir = request.getParameter("parent");
                 String filesStr = request.getParameter("files");
                 zipname = request.getParameter("name");
                 int compression = Integer.parseInt(request.getParameter("compression"));
-                FileOperations.startZippingFiles(baseDir + File.separatorChar + mail + "\"" + zipname, filesStr, compression);
+                FileOperations.startZippingFiles(baseDir + File.separatorChar + mail + "\"" + parentDir + zipname, filesStr, compression);
                 Utils.sendSuccessResp(out, output);
                 break;
 
