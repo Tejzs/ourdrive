@@ -521,7 +521,7 @@ label.start-btn {
   background: rgba(255, 255, 255, 0.5);
   width: 100%;
   transform-origin: left;
-  animation: shrink 5s linear forwards;
+  animation: shrink 2s alternate forwards;
 }
 
 #chunk-size {
@@ -625,6 +625,7 @@ label.start-btn {
 /* ===== Modal Box ===== */
 .modal {
   position: relative;
+  top: -100px;
   width: 360px;
   padding: 28px 32px;
   background: #1c1c20;
@@ -652,6 +653,7 @@ label.start-btn {
 /* Inputs */
 .modal input[type="text"] {
   width: 100%;
+  height: 30px;
   padding: 10px 12px;
   border-radius: 6px;
   border: 1px solid #2f2f36;
@@ -661,16 +663,70 @@ label.start-btn {
 }
 
 .modal input[type="text"]:focus {
-  border-color: #8ab4f8;
-  box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.2);
   outline: none;
 }
 
 /* Slider */
 .modal input[type="range"] {
+  flex: none;
   width: 100%;
-  margin-top: 10px;
+  scroll-snap-align: start;
+  padding: 5px 0px 5px 0px;
+  box-sizing: border-box;
+
+  /* Apple-style base */
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #e5e5ea;
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
 }
+
+/* WebKit track */
+.modal input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: #e5e5ea;
+  border-radius: 999px;
+}
+
+/* WebKit thumb */
+.modal input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 16px;
+  background: #fff;
+  border-radius: 30%;
+  margin-top: -7px;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+  transition: transform 0.15s ease;
+}
+
+.modal input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(1.15);
+}
+
+/* Firefox */
+.modal input[type="range"]::-moz-range-track {
+  height: 4px;
+  background: #e5e5ea;
+  border-radius: 999px;
+}
+
+.modal input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 16px;
+  background: #fff;
+  border-radius: 30%;
+  border: none;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
 
 /* Slider value */
 .slider-value {
@@ -699,12 +755,16 @@ label.start-btn {
 
 /* Confirm */
 .modal-actions .confirm-btn {
-  background: #8ab4f8;
-  color: #111;
+  background: #6ea8fe;        /* softer blue */
+  color: #0b1220;    
 }
 
 .modal-actions .confirm-btn:hover {
-  background: #a5c2fa;
+  background: #7db2ff;
+}
+
+.modal input::placeholder {
+  color: #8e8e93;
 }
 
 .modal-actions .confirm-btn:active {
@@ -714,16 +774,16 @@ label.start-btn {
 /* Top-left close (X) button */
 .modal-close {
   position: absolute;
-  top: 12px;
-  left: 12px;
+  top: 6px;
+  left: 6px;
 
   width: 28px;
   height: 28px;
   border-radius: 50%;
   border: none;
 
-  background: rgba(255, 255, 255, 0.06);
-  color: #c9c9d1;
+  background: inherit;
+  color: hsla(0,0%,100%,.4);
 
   font-size: 18px;
   font-weight: 500;
@@ -735,10 +795,9 @@ label.start-btn {
 }
 
 .modal-close:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #fff;
+  color: hsla(0,0%,100%,.5);
 }
 
 .modal-close:active {
-  background: rgba(255, 255, 255, 0.18);
+  color: hsla(0,0%,100%,.4);
 }

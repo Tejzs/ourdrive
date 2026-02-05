@@ -754,7 +754,10 @@ function getOptimalChunkSize(fileSize) {
 function deleteSelected() {
   const checkedCheckboxes = document.querySelectorAll('input[name="fileSelector"]:checked');
   const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
-  console.log(selectedValues.join(','));
+  if (selectedValues.length == 0) {
+    Logger.failure("Nothing to delete");
+    return;
+  }  
 
   fetch(`./file-operations?method=delete&parent=${currentDir}&files=${selectedValues.join('"').replaceAll("&", "%26")}`)
     .then((resp) => resp.json())
@@ -782,7 +785,9 @@ function newFolder() {
           Logger.failure("Error creating folder");
         }
       });
-
+  }
+  else {
+    Logger.failure("Failed to create new folder"); 
   }
 }
 
@@ -948,7 +953,17 @@ function closeModal() {
   modal.style.display = "none";
 }
 
+let checkedCheckboxes;
+let selectedValues;
+
 function openModal() {
+  checkedCheckboxes = document.querySelectorAll('input[name="fileSelector"]:checked');
+  selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
+  if (selectedValues.length == 0) {
+    Logger.failure("Nothing to compress");
+    return;
+  }
+
   modal.style.display = "flex";
 }
 
@@ -967,16 +982,12 @@ function submitModal() {
     return;
   }
 
-  createZip(name, level);
+  createZip(name, level, selectedValues);
   closeModal();
 }
 
 
-function createZip(fileName, level) {
-  const checkedCheckboxes = document.querySelectorAll('input[name="fileSelector"]:checked');
-  const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
-  console.log(selectedValues.join('"'));
-
+function createZip(fileName, level, selectedValues) {
   fetch(`./file-operations?method=zip&parent=${currentDir+"/"}&files=${currentDir + "/" + selectedValues.join('"' + currentDir + "/")}&name=${fileName+".zip"}&compression=${level}`)
     .then((resp) => resp.json())
     .then((data) => {
