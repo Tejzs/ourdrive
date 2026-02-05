@@ -18,7 +18,7 @@ public class FileAccessFilter extends HttpFilter {
         String requestURI = Utils.getRequestURI(servletRequest).substring(PRODNAME_PREFIX_LEN);
         String mail = SessionData.getThreadLocalSessionData().getMail();
 
-        if (requestURI.substring(0, requestURI.indexOf("/")).equals(mail)) {
+        if (!requestURI.substring(0, requestURI.indexOf("/")).equals(mail)) {
             servletResponse.sendRedirect("Pages/unauthorized");
         }
 

@@ -23,7 +23,7 @@
     </filter>
     <filter-mapping>
         <filter-name>fileAccessFilter</filter-name>
-        <url-pattern>Files/*</url-pattern>
+        <url-pattern>/Files/*</url-pattern>
     </filter-mapping>
     <!-- End of ilters/AuthenticationFilter -->
 
