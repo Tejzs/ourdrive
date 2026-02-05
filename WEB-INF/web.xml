@@ -16,6 +16,17 @@
     </filter-mapping>
     <!-- End of ilters/AuthenticationFilter -->
 
+    <!-- Start of ilters/AuthenticationFilter -->
+    <filter>
+        <filter-name>fileAccessFilter</filter-name>
+        <filter-class>filters.FileAccessFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>fileAccessFilter</filter-name>
+        <url-pattern>Files/*</url-pattern>
+    </filter-mapping>
+    <!-- End of ilters/AuthenticationFilter -->
+
     <!-- Start of ervlets/LoginServlet -->
     <servlet>
         <servlet-name>loginservlet</servlet-name>
