@@ -78,7 +78,7 @@ public class FileViewServlet extends HttpServlet {
         case "listSharedFiles":
             String sharedMainDir = request.getParameter("sharedMainDir");
             String subDirs = request.getParameter("sharedSubDirs");
-            requestedFile = new File(sharedMainDir + subDirs);
+            requestedFile = new File(serverRootDir + "Files/" + sharedMainDir + subDirs);
             if (requestedFile.exists()) {
                 try {
                     AccessibilityHandler.getInstance().checkAccessible(sharedMainDir, mail);

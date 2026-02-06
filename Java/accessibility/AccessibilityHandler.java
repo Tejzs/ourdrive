@@ -116,7 +116,7 @@ public class AccessibilityHandler {
         pstmt.setString(2, dir);
 
         ResultSet rs = pstmt.executeQuery();
-        String code = "";
+        String code;
         if (rs.next()) {
             code = rs.getString("shareid");
         } else {
@@ -128,8 +128,12 @@ public class AccessibilityHandler {
 
         rs = pstmt.executeQuery();
 
-        String codes = rs.getString("contents");
-        if (Utils.stringIsEmpty(codes) || !codes.contains(code)) {
+        if (rs.next()) {
+            String codes = rs.getString("contents");
+            if (Utils.stringIsEmpty(codes) || !codes.contains(code)) {
+                throw new IllegalArgumentException("The folder isn't accessible");
+            }
+        } else {
             throw new IllegalArgumentException("The folder isn't accessible");
         }
     }
