@@ -7,12 +7,12 @@ public class Properties {
     private static String DB_PASSWORD;
     private static String DB_PORT;
     private static String DB_HOST;
-    private static String LOG_PATH;
+    private static String APP_SUB_PATH;
 
-    public static void loadConfigurations() {
+    public static void loadConfigurations(String appPath) {
         java.util.Properties props = new java.util.Properties();
 
-        try (FileInputStream fis = new FileInputStream("/mnt/wwn-0x5000c500c67d4454-part1/Server/apache-tomcat-9.0.98/webapps/FileStorage/WEB-INF/config.properties")) {
+        try (FileInputStream fis = new FileInputStream(appPath + "WEB-INF/config.properties")) {
             props.load(fis);
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -21,7 +21,7 @@ public class Properties {
         DB_PASSWORD = props.getProperty("db.pass");
         DB_HOST = props.getProperty("db.host");
         DB_PORT = props.getProperty("db.port");
-        LOG_PATH = props.getProperty("log.path");
+        APP_SUB_PATH = props.getProperty("app.subpath");
     }
 
 
@@ -41,7 +41,7 @@ public class Properties {
         return DB_HOST;
     }
 
-    public static String getLogPath() {
-        return LOG_PATH;
+    public static String getAppSubPath() {
+        return APP_SUB_PATH;
     }
 }

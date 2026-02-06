@@ -1,5 +1,6 @@
 package filters;
 
+import config.Properties;
 import utility.SessionData;
 import utility.Utils;
 
@@ -11,7 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class FileAccessFilter extends HttpFilter {
-    private static final int PRODNAME_PREFIX_LEN = "/FileStorage/Files/".length();
+    private static final int PRODNAME_PREFIX_LEN = (Properties.getAppSubPath() + "Files/").length();
 
     @Override
     public void doFilter(HttpServletRequest servletRequest, HttpServletResponse servletResponse, FilterChain filterChain) throws ServletException, IOException {
@@ -19,7 +20,7 @@ public class FileAccessFilter extends HttpFilter {
         String mail = SessionData.getThreadLocalSessionData().getMail();
 
         if (!requestURI.substring(0, requestURI.indexOf("/")).equals(mail)) {
-            servletResponse.sendRedirect("/FileStorage/Pages/unauthorized.html");
+            servletResponse.sendRedirect(Properties.getAppSubPath() + "Pages/unauthorized.html");
         }
 
         filterChain.doFilter(servletRequest, servletResponse);

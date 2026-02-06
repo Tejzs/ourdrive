@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import auth.Authentication;
 import utility.Utils;
-import utility.Logger;
 
 public class LoginServlet extends HttpServlet {
     private static final String className = "LoginServlet";
@@ -29,8 +28,6 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         PrintWriter out = response.getWriter();
         JSONObject output = new JSONObject();
-        Logger log = Utils.getLogger("LoginServlet");
-
         try {
             String mail = request.getParameter("mail");
             String pass = request.getParameter("pass");
@@ -52,8 +49,6 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         PrintWriter out = response.getWriter();
         JSONObject output = new JSONObject();
-        Logger log = Utils.getLogger("LoginServlet");
-
         try {
             JSONObject input = new JSONObject(Utils.readFromStreamAsString(request.getInputStream()));
 

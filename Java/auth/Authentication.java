@@ -23,8 +23,6 @@ public class Authentication {
         String storedPassHash = "";
         String providedPassHash = Utils.hashHex(password);
 
-        Logger log = Utils.getLogger("Authentication");
-
         PreparedStatement PreparedStatement = con.prepareStatement("SELECT pass_hash FROM Users WHERE mail = ?");
         PreparedStatement.setString(1, usermail);
 
