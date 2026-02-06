@@ -20,7 +20,6 @@ import utility.*;
 
 
 public class FileChunker {
-    private Logger log = Utils.getLogger("FileChunker");
     private File file;
     private File res;
     private FileOperationsMeta meta;

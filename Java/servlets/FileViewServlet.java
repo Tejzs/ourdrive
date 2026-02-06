@@ -40,8 +40,6 @@ public class FileViewServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        Logger log = Utils.getLogger(CLASS_NAME);
-
         PrintWriter out = response.getWriter();
 
         String mail = SessionData.getThreadLocalSessionData().getMail();
@@ -54,12 +52,9 @@ public class FileViewServlet extends HttpServlet {
         String userDataPath = serverRootDir + mail;
         File userFileObj = new File(userDataPath + dir);
 
-        log.log(userDataPath);
-
         switch (method) {
             case "listFiles":
                 File requestedFile = new File(userDataPath + "/" + dir);
-                log.log(requestedFile.getAbsolutePath());
                 if (requestedFile.exists()) {
                     JSONArray fileArray = new JSONArray();
 

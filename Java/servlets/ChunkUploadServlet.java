@@ -45,7 +45,6 @@ public class ChunkUploadServlet extends HttpServlet {
             throws ServletException, IOException {
 
         PrintWriter out = resp.getWriter();
-        Logger log = Utils.getLogger(CLASS_NAME);
 
         String mail = SessionData.getThreadLocalSessionData().getMail();
         String fileName = req.getParameter("filename");
@@ -54,8 +53,6 @@ public class ChunkUploadServlet extends HttpServlet {
         long chunksize = Long.parseLong(req.getParameter("chunksize"));
         long filesize = Long.parseLong(req.getParameter("filesize"));
         int totalChunks = Integer.parseInt(req.getParameter("totalchunks"));
-
-        log.log(fileName);
 
         FileUploadMeta fileUploadMeta = new FileUploadMeta(
             fileHash,
@@ -76,8 +73,6 @@ public class ChunkUploadServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        Logger log = Utils.getLogger(CLASS_NAME);
 
         PrintWriter out = resp.getWriter();
         

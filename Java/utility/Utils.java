@@ -30,10 +30,6 @@ public class Utils {
         return str == null || str.length() == 0;
     }
 
-    public static Logger getLogger(String className) {
-        return new Logger(className);
-    }
-
     public static void sendSuccessResp(PrintWriter writer, JSONObject respJson) {
         respJson.put("status", "success");
         writer.println(respJson.toString());

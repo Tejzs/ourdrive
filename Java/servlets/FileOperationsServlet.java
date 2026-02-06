@@ -8,12 +8,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import meta.FileOperationsMeta;
 import operations.FileOperations;
 import org.json.JSONObject;
 
 import utility.SessionData;
-import utility.Logger;
 import utility.Utils;
 
 public class FileOperationsServlet extends HttpServlet {
