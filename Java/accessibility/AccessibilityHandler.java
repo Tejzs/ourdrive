@@ -22,8 +22,15 @@ public class AccessibilityHandler {
     }
 
     public void registerAccessCode(String code, String folder, String mail) throws SQLException {
+        PreparedStatement pstmt = con.prepareStatement("SELECT shareid FROM ShareRecords WHERE owner = ? AND folder = ?");
+        pstmt.setString(1, mail);
+        pstmt.setString(2, folder);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            throw new IllegalArgumentException("Code already generated for folder: " + folder);
+        }
 
-        PreparedStatement pstmt = con.prepareStatement("INSERT INTO ShareRecords VALUES (?, ?, ?)");
+        pstmt = con.prepareStatement("INSERT INTO ShareRecords VALUES (?, ?, ?)");
         pstmt.setString(1, code);
         pstmt.setString(2, mail);
         pstmt.setString(3, folder);
@@ -54,7 +61,7 @@ public class AccessibilityHandler {
         if (rs.next()) {
             String currCodes = rs.getString("contents");
             if (currCodes.contains(code)) {
-                return;
+                throw new RuntimeException("Code already activated");
             }
             currCodes += "," + code;
             pstmt = con.prepareStatement("UPDATE AccessibleContent SET contents = ? WHERE mail = ?");

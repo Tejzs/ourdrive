@@ -30,7 +30,7 @@ public class ShareServlet extends HttpServlet {
         try {
             switch (method) {
             case "create":
-                if (!new File(Utils.getServerHomeInServer(getServletContext()) + "Files/" + folder).exists()) {
+                if (!new File(Utils.getServerHomeInServer(getServletContext()) + "Files/" + mail + folder).exists()) {
                     throw new IllegalArgumentException("Folder does not exist");
                 }
                 AccessibilityHandler.getInstance().registerAccessCode(code, folder, mail);
