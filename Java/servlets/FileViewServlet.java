@@ -79,6 +79,8 @@ public class FileViewServlet extends HttpServlet {
             String sharedMainDir = request.getParameter("sharedMainDir");
             String subDirs = request.getParameter("sharedSubDirs");
             requestedFile = new File(serverRootDir + sharedMainDir + subDirs);
+            System.out.println(requestedFile.getAbsolutePath());
+            requestedFile = new File(serverRootDir + sharedMainDir + subDirs);
             if (requestedFile.exists()) {
                 try {
                     AccessibilityHandler.getInstance().checkAccessible(sharedMainDir, mail);

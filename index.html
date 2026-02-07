@@ -21,7 +21,18 @@
       </div>
       <div id="tabSection" class="top-bar">
         <div id="options" class="options">
-          <a id="root" class="root" onclick="retrieveRootPath()">root</a>
+          <label class="file-upload">
+            <span onclick="showShared()"><svg width="15" height="15" viewBox="0 0 16 16"
+                xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                <path
+                  d="M3.14598 5.85423L7.64598 10.3542C7.84098 10.5492 8.15798 10.5492 8.35298 10.3542L12.853 5.85423C13.048 5.65923 13.048 5.34223 12.853 5.14723C12.658 4.95223 12.341 4.95223 12.146 5.14723L7.99998 9.29323L3.85398 5.14723C3.65898 4.95223 3.34198 4.95223 3.14698 5.14723C2.95198 5.34223 2.95098 5.65923 3.14598 5.85423Z" />
+              </svg></span>
+          </label>
+          <div class="sharedDropDown" id="shareSelect">
+            <span id="root" onclick="userSpace()">root</span>
+          </div>
+
+          <a id="rootPath" class="root" onclick="retrieveRootPath()">root</a>
           <p id="sep" class="sep">/</p>
         </div>
         <select id="chunk-size">
@@ -48,7 +59,11 @@
           <span onclick="deleteSelected()">Delete</span>
         </label>
         <label class="file-upload">
-          <span>Share</span>
+          <span onclick="share()">Share</span>
+        </label>
+        <label class="new-folder">
+          <span onclick="enterCode()">Enter Code</span>
+          <input id="codeInput" class="folder-input" type="text" placeholder="Enter Code" />
         </label>
         <label class="file-upload">
           <span onclick="openModal()">Compress</span>
@@ -81,7 +96,6 @@
         <div id="chunkBar" class="chunk-status">
           <h1>File Operation Status</h1>
           <div id="chunkStatus">
-
           </div>
         </div>
       </div>
@@ -109,7 +123,6 @@
         </div>
       </div>
     </div>
-
   </main>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/build/sha256.min.js"></script>

@@ -125,31 +125,54 @@ function closeBtn() {
   document.getElementById("loginFailed").classList.add("hidden");
 }
 
-// { "status": "sucess", "files" : ["a.txt", "b.txt", "Temp/"] }
 currentDir = "";
 let options = document.getElementById("options");
 
 let pathStack = [];
 function updatePath(dir = "") {
-  pathStack.push(dir);
-  let fullPath = pathStack.join("/");
-  let a = document.createElement("a");
-  a.dataset.path = fullPath;
-  let p = document.createElement("p");
-  p.id = "sep";
-  p.className = "sep";
-  p.innerHTML = "/";
-  a.innerHTML = dir;
-  options.appendChild(a);
-  options.appendChild(p);
+  if (currentSpace == "User") {
+    pathStack.push(dir);
+    let fullPath = pathStack.join("/");
+    let a = document.createElement("a");
+    a.dataset.path = fullPath;
+    let p = document.createElement("p");
+    p.id = "sep";
+    p.className = "sep";
+    p.innerHTML = "/";
+    a.innerHTML = dir;
+    options.appendChild(a);
+    options.appendChild(p);
 
-  a.onclick = () => {
-    retrieveFile(a.dataset.path);
-    pathStack = a.dataset.path.split("/");
-    while (p.nextSibling) {
-      options.removeChild(p.nextSibling);
-    }
-  };
+    a.onclick = () => {
+      retrieveFile(a.dataset.path, false);
+      pathStack = a.dataset.path.split("/");
+      while (p.nextSibling) {
+        options.removeChild(p.nextSibling);
+      }
+    };
+  }
+  else {
+    pathStack.push(dir);
+    let fullPath = pathStack.join("/");
+    let a = document.createElement("a");
+    a.dataset.path = fullPath;
+    let p = document.createElement("p");
+    p.id = "sep";
+    p.className = "sep";
+    p.innerHTML = "/";
+    a.innerHTML = dir;
+    options.appendChild(a);
+    options.appendChild(p);
+
+    a.onclick = () => {
+      retrieveFile("", currentSpace, fullPath, true);
+      subFolders = "/" + fullPath + "/";
+      pathStack = a.dataset.path.split("/");
+      while (p.nextSibling) {
+        options.removeChild(p.nextSibling);
+      }
+    };
+  }
 }
 
 function getPathData() {
@@ -160,17 +183,23 @@ function getPathData() {
     let substr = loc.startsWith("/") ? 2 : 1;
     loc = loc.substring(1);
     currentDir = loc;
-    retrieveFile(loc);
+    retrieveFile(loc, false);
     console.log(loc)
   }
 }
 
 function retrieveRootPath() {
-  let p = document.getElementById("sep");
-  retrieveFile();
-  pathStack = [];
-  while (p.nextSibling) {
-    options.removeChild(p.nextSibling);
+  if (currentSpace == "User") {
+    let p = document.getElementById("sep");
+    retrieveFile();
+    pathStack = [];
+    currentSpace = "User";
+    while (p.nextSibling) {
+      options.removeChild(p.nextSibling);
+    }
+  }
+  else {
+    switchSpace(currentSpace);
   }
 }
 
@@ -191,6 +220,9 @@ function toBytes(size) {
   return value[0];
 }
 
+let currentSpace = "User";
+let subFolders = "/";
+
 function renderTable(files, tbody) {
   tbody.innerHTML = "";
   files.forEach((file) => {
@@ -207,7 +239,7 @@ function renderTable(files, tbody) {
     dA.href = `./Files/tejasvishnusv@gmail.com/${encodeURIComponent(file.name)}`;
     dA.download = file.name;
     dA.innerHTML = `
-    <svg width="16" height="16" viewBox="0 0 16 16"
+    <svg width="15" height="15" viewBox="0 0 16 16"
         xmlns="http://www.w3.org/2000/svg" fill="currentColor">
       <path d="M12 13.5C12 13.776 11.776 14 11.5 14H3.5C3.224 14 3 13.776 3 13.5C3 13.224 3.224 13 3.5 13H11.5C11.776 13 12 13.224 12 13.5ZM7.146 11.854C7.341 12.049 7.658 12.049 7.853 11.854L11.853 7.854C12.048 7.659 12.048 7.342 11.853 7.147C11.658 6.952 11.341 6.952 11.146 7.147L8 10.294V1.5C8 1.224 7.776 1 7.5 1C7.224 1 7 1.224 7 1.5V10.293L3.854 7.146C3.659 6.951 3.342 6.951 3.147 7.146C2.952 7.341 2.952 7.658 3.147 7.853L7.147 11.853Z"/>
     </svg>`;
@@ -237,7 +269,7 @@ function renderTable(files, tbody) {
     cb.className = "fileSelector";
     cb.value = file.name;
     const emptyTd = document.createElement("td");
-    file.type == "folder" ?  tr.append(tdcb, emptyTd ,tdName, tdKind, tdSize, tdDate, tdShared) : tr.append(tdcb, tdDown, tdName, tdKind, tdSize, tdDate, tdShared);
+    file.type == "folder" ? tr.append(tdcb, emptyTd, tdName, tdKind, tdSize, tdDate, tdShared) : tr.append(tdcb, tdDown, tdName, tdKind, tdSize, tdDate, tdShared);
     tbody.append(tr);
 
     if (file.type == "folder") {
@@ -251,7 +283,13 @@ function renderTable(files, tbody) {
           nextDir = file.name;
         }
         updatePath(file.name);
-        retrieveFile(nextDir);
+        if (currentSpace == "User") {
+          retrieveFile(nextDir, false);
+        }
+        else {
+          subFolders += nextDir + "/";
+          retrieveFile("", currentSpace, subFolders, true);
+        }
       };
     }
     tbody.append(tr);
@@ -259,89 +297,173 @@ function renderTable(files, tbody) {
 
 }
 let sortAsc = false;
-function retrieveFile(dir = "") {
+function retrieveFile(dir = "", shared = "", sub = "", showShare = false) {
   let tbody = document.getElementById("files");
   currentDir = dir;
-  fetch(`./file-view?method=listFiles&dir=${dir}`)
-    .then((response) => {
-      file;
-      if (!response.ok) {
-        throw new Error("HTTP error " + response.status);
-      }
-      return response.json(); // convert response to JSON
-    })
-    .then((data) => {
-      console.log(data);
-      if (data.status == "success") {
-        data.files.sort((a, b) => !sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
-        renderTable(data.files, tbody);
+  if (showShare == false) {
+    fetch(`./file-view?method=listFiles&dir=${dir}`)
+      .then((response) => {
+        file;
+        if (!response.ok) {
+          throw new Error("HTTP error " + response.status);
+        }
+        return response.json(); // convert response to JSON
+      })
+      .then((data) => {
+        console.log(data);
+        if (data.status == "success") {
+          data.files.sort((a, b) => !sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+          renderTable(data.files, tbody);
 
-        let name = document.getElementById("name");
-        name.onclick = () => {
-          data.files.sort((a, b) => sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
-          sortAsc = !sortAsc;
-          name.innerText = sortAsc ? "Name ↓" : "Name ↑";
-          type.innerHTML = "Type";
-          size.innerHTML = "Size";
-          date.innerHTML = "Date";
-          mO.innerHTML = "mainOwner";
-          renderTable(data.files, tbody)
-        }
-        let type = document.getElementById("type");
-        type.onclick = () => {
-          data.files.sort((a, b) => sortAsc ? a.type.localeCompare(b.type) : b.type.localeCompare(a.type));
-          sortAsc = !sortAsc;
-          type.innerText = sortAsc ? "Type ↓" : "Type ↑";
-          name.innerHTML = "Name";
-          size.innerHTML = "Size";
-          date.innerHTML = "Date";
-          mO.innerHTML = "mainOwner";
-          renderTable(data.files, tbody)
-        }
-        let size = document.getElementById("size");
-        size.onclick = () => {
-          data.files.sort((a, b) => sortAsc ? toBytes(a.size) - toBytes(b.size) : toBytes(b.size) - toBytes(a.size));
-          sortAsc = !sortAsc;
-          size.innerText = sortAsc ? "Size ↓" : "Size ↑";
-          name.innerHTML = "Name";
-          type.innerHTML = "Type";
-          date.innerHTML = "Date";
-          mO.innerHTML = "mainOwner";
-          renderTable(data.files, tbody)
-        }
+          let name = document.getElementById("name");
+          name.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+            sortAsc = !sortAsc;
+            name.innerText = sortAsc ? "Name ↓" : "Name ↑";
+            type.innerHTML = "Type";
+            size.innerHTML = "Size";
+            date.innerHTML = "Date";
+            mO.innerHTML = "mainOwner";
+            renderTable(data.files, tbody)
+          }
+          let type = document.getElementById("type");
+          type.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? a.type.localeCompare(b.type) : b.type.localeCompare(a.type));
+            sortAsc = !sortAsc;
+            type.innerText = sortAsc ? "Type ↓" : "Type ↑";
+            name.innerHTML = "Name";
+            size.innerHTML = "Size";
+            date.innerHTML = "Date";
+            mO.innerHTML = "mainOwner";
+            renderTable(data.files, tbody)
+          }
+          let size = document.getElementById("size");
+          size.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? toBytes(a.size) - toBytes(b.size) : toBytes(b.size) - toBytes(a.size));
+            sortAsc = !sortAsc;
+            size.innerText = sortAsc ? "Size ↓" : "Size ↑";
+            name.innerHTML = "Name";
+            type.innerHTML = "Type";
+            date.innerHTML = "Date";
+            mO.innerHTML = "mainOwner";
+            renderTable(data.files, tbody)
+          }
 
-        let date = document.getElementById("date");
-        date.onclick = () => {
-          data.files.sort((a, b) => sortAsc ? a.lastMod.localeCompare(b.lastMod) : b.lastMod.localeCompare(a.lastMod));
-          sortAsc = !sortAsc;
-          date.innerText = sortAsc ? "Date ↓" : "Date ↑";
-          name.innerHTML = "Name";
-          type.innerHTML = "Type";
-          size.innerHTML = "Size";
-          mO.innerHTML = "mainOwner";
-          renderTable(data.files, tbody)
-        }
+          let date = document.getElementById("date");
+          date.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? a.lastMod.localeCompare(b.lastMod) : b.lastMod.localeCompare(a.lastMod));
+            sortAsc = !sortAsc;
+            date.innerText = sortAsc ? "Date ↓" : "Date ↑";
+            name.innerHTML = "Name";
+            type.innerHTML = "Type";
+            size.innerHTML = "Size";
+            mO.innerHTML = "mainOwner";
+            renderTable(data.files, tbody)
+          }
 
-        let mO = document.getElementById("mainOwner");
-        mainOwner.onclick = () => {
-          data.files.sort((a, b) => sortAsc ? a.owner.localeCompare(b.owner) : b.owner.localeCompare(a.owner));
-          sortAsc = !sortAsc;
-          mO.innerText = sortAsc ? "mainOwner ↓" : "mainOwner ↑";
-          name.innerHTML = "Name";
-          type.innerHTML = "Type";
-          size.innerHTML = "Size";
-          date.innerHTML = "Date";
-          renderTable(data.files, tbody)
+          let mO = document.getElementById("mainOwner");
+          mainOwner.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? a.owner.localeCompare(b.owner) : b.owner.localeCompare(a.owner));
+            sortAsc = !sortAsc;
+            mO.innerText = sortAsc ? "mainOwner ↓" : "mainOwner ↑";
+            name.innerHTML = "Name";
+            type.innerHTML = "Type";
+            size.innerHTML = "Size";
+            date.innerHTML = "Date";
+            renderTable(data.files, tbody)
+          }
         }
-      }
-      if (data.status == "failure") {
-        Logger.failure("Error fetching files: " + data.msg);
-        return false;
-      }
-    })
-    .catch((error) => {
-      Logger.failure("Error: " + error);
-    });
+        if (data.status == "failure") {
+          Logger.failure("Error fetching files: " + data.msg);
+          return false;
+        }
+      })
+      .catch((error) => {
+        Logger.failure("Error: " + error);
+      });
+  }
+  else {
+    fetch(`./file-view?method=listSharedFiles&sharedMainDir=${shared}&sharedSubDirs=${sub}`)
+      .then((response) => {
+        file;
+        if (!response.ok) {
+          throw new Error("HTTP error " + response.status);
+        }
+        return response.json(); // convert response to JSON
+      })
+      .then((data) => {
+        console.log(data);
+        if (data.status == "success") {
+          data.files.sort((a, b) => !sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+          renderTable(data.files, tbody);
+
+          let name = document.getElementById("name");
+          name.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+            sortAsc = !sortAsc;
+            name.innerText = sortAsc ? "Name ↓" : "Name ↑";
+            type.innerHTML = "Type";
+            size.innerHTML = "Size";
+            date.innerHTML = "Date";
+            mO.innerHTML = "mainOwner";
+            renderTable(data.files, tbody)
+          }
+          let type = document.getElementById("type");
+          type.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? a.type.localeCompare(b.type) : b.type.localeCompare(a.type));
+            sortAsc = !sortAsc;
+            type.innerText = sortAsc ? "Type ↓" : "Type ↑";
+            name.innerHTML = "Name";
+            size.innerHTML = "Size";
+            date.innerHTML = "Date";
+            mO.innerHTML = "mainOwner";
+            renderTable(data.files, tbody)
+          }
+          let size = document.getElementById("size");
+          size.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? toBytes(a.size) - toBytes(b.size) : toBytes(b.size) - toBytes(a.size));
+            sortAsc = !sortAsc;
+            size.innerText = sortAsc ? "Size ↓" : "Size ↑";
+            name.innerHTML = "Name";
+            type.innerHTML = "Type";
+            date.innerHTML = "Date";
+            mO.innerHTML = "mainOwner";
+            renderTable(data.files, tbody)
+          }
+
+          let date = document.getElementById("date");
+          date.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? a.lastMod.localeCompare(b.lastMod) : b.lastMod.localeCompare(a.lastMod));
+            sortAsc = !sortAsc;
+            date.innerText = sortAsc ? "Date ↓" : "Date ↑";
+            name.innerHTML = "Name";
+            type.innerHTML = "Type";
+            size.innerHTML = "Size";
+            mO.innerHTML = "mainOwner";
+            renderTable(data.files, tbody)
+          }
+
+          let mO = document.getElementById("mainOwner");
+          mainOwner.onclick = () => {
+            data.files.sort((a, b) => sortAsc ? a.owner.localeCompare(b.owner) : b.owner.localeCompare(a.owner));
+            sortAsc = !sortAsc;
+            mO.innerText = sortAsc ? "mainOwner ↓" : "mainOwner ↑";
+            name.innerHTML = "Name";
+            type.innerHTML = "Type";
+            size.innerHTML = "Size";
+            date.innerHTML = "Date";
+            renderTable(data.files, tbody)
+          }
+        }
+        if (data.status == "failure") {
+          Logger.failure("Error fetching files: " + data.msg);
+          return false;
+        }
+      })
+      .catch((error) => {
+        Logger.failure("Error: " + error);
+      });
+  }
 }
 
 function selectAll() {
@@ -355,6 +477,7 @@ function selectAll() {
 function updateProfile() {
   let profile = document.getElementById("profile");
   let root = document.getElementById("root");
+  let rootPath = document.getElementById("rootPath");
   fetch(`./user?method=currUser`)
     .then((response) => {
       if (!response.ok) {
@@ -367,6 +490,7 @@ function updateProfile() {
       if (data.status == "success") {
         profile.innerHTML = data.currUser;
         root.innerHTML = data.currUser;
+        rootPath.innerHTML = data.currUser;
       }
       if (data.status == "failure") {
         console.log(data.msg);
@@ -565,6 +689,10 @@ async function uploadMetaData(file, fileHash, cSize, dir = "") {
 }
 
 function UploadFiles() {
+  if (currentSpace != "User") {
+    Logger.failure("You don't have permission");
+    return;
+  }
   let chuckSize = document.getElementById("chunk-size").value;
   startUpload(chuckSize);
 }
@@ -769,6 +897,10 @@ function getOptimalChunkSize(fileSize) {
 }
 
 function deleteSelected() {
+  if (currentSpace != "User") {
+    Logger.failure("You don't have permission");
+    return;
+  }
   const checkedCheckboxes = document.querySelectorAll('input[name="fileSelector"]:checked');
   const selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
   if (selectedValues.length == 0) {
@@ -791,6 +923,11 @@ function deleteSelected() {
 
 
 function newFolder() {
+  if (currentSpace != "User") {
+    Logger.failure("You don't have permission");
+    return;
+  }
+
   let folderName = document.getElementById("folderInput").value.trim();
   if (folderName) {
     fetch(`./file-operations?method=mkdir&parent=${currentDir}&folder=${folderName}`)
@@ -851,6 +988,11 @@ function cancelUpload(uploadId) {
 }
 
 function uploadFolders() {
+  if (currentSpace != "User") {
+    Logger.failure("You don't have permission");
+    return;
+  }
+
   let chuckSize = document.getElementById("chunk-size").value;
   startFolderUpload(chuckSize);
   getUsage();
@@ -978,6 +1120,11 @@ let checkedCheckboxes;
 let selectedValues;
 
 function openModal() {
+  if (currentSpace != "User") {
+    Logger.failure("You don't have permission");
+    return;
+  }
+
   checkedCheckboxes = document.querySelectorAll('input[name="fileSelector"]:checked');
   selectedValues = Array.from(checkedCheckboxes).map(checkbox => checkbox.value);
   if (selectedValues.length == 0) {
@@ -1021,7 +1168,6 @@ function createZip(fileName, level, selectedValues) {
         Logger.failure("Error compressing file/files");
       }
     });
-
 }
 
 function getUsage() {
@@ -1045,5 +1191,90 @@ function getUsage() {
     .catch((error) => {
       console.error("Error:", error);
     });
-
 }
+
+function share() {
+  if (currentSpace != "User") {
+    Logger.failure("You don't have permission");
+    return;
+  }
+
+  fetch(`./share?method=create&folder=/${currentDir}/`)
+    .then((resp) => resp.json())
+    .then((data) => {
+      if (data.status == "success") {
+        console.log("shared: " + data.code);
+      } else {
+        Logger.failure("Error compressing file/files");
+      }
+    });
+}
+
+let dropdown = document.getElementById("shareSelect");
+function showShared() {
+  dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  fetch(`./share?method=list`)
+    .then((resp) => resp.json())
+    .then((data) => {
+      if (data.status == "success") {
+        while (dropdown.children.length > 1) {
+          dropdown.removeChild(options.children[1]);
+        }
+
+        data.data.forEach(element => {
+          let span = document.createElement("span");
+          span.innerText = element;
+          span.addEventListener("click", () => {
+            switchSpace(element);
+          });
+          dropdown.append(span);
+        });
+      } else {
+        Logger.failure("Error compressing file/files");
+      }
+    });
+}
+
+function enterCode() {
+  if (currentSpace != "User") {
+    Logger.failure("You don't have permission");
+    return;
+  }
+
+  let code = document.getElementById("codeInput").value;
+  fetch("./share", { method: "POST", body: JSON.stringify({ "code": `${code}` }) })
+    .then((resp) => resp.json())
+    .then((data) => {
+      if (data.status == "success") {
+        console.log("got codes")
+      } else {
+        Logger.failure("Invalid Code");
+      }
+    });
+}
+
+function switchSpace(path) {
+  subFolders = "/";
+  pathStack = [];
+  while (options.children.length > 4) {
+    options.removeChild(options.children[4]);
+  }
+  console.log(path);
+  retrieveFile("", path, "", true)
+  currentSpace = path;
+  dropdown.style.display = 'none';
+  document.getElementById("rootPath").innerText = currentSpace;
+};
+
+function userSpace() {
+  currentSpace = "User";
+  updateProfile();
+  retrieveRootPath();
+  dropdown.style.display = 'none';
+}
+
+document.addEventListener('click', (e) => {
+  if (!document.getElementById("options").contains(e.target) && !document.getElementById("shareSelect").contains(e.target)) {
+    document.getElementById("shareSelect").style.display = 'none';
+  }
+});
