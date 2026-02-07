@@ -3,12 +3,15 @@ package auth;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import mysql.SqlConnectionFactory;
 import utility.*;
 
 public class Authentication {
     private Connection con;
+    private static final Map<String, String> CACHE = new HashMap<>();
 
     Authentication() throws Exception {
         con = SqlConnectionFactory.getConnection();
@@ -45,16 +48,19 @@ public class Authentication {
 
     public boolean isVaildTicket(String mail, String ticket) throws Exception {
         if (!Utils.stringIsEmpty(mail) && !Utils.stringIsEmpty(ticket)) {
+            if (CACHE.getOrDefault(mail, "").equals(ticket)) {
+                return true;
+            }
             PreparedStatement preparedStatement = con.prepareStatement("SELECT ticket FROM Session WHERE mail = ?");
             preparedStatement.setString(1, mail);
             ResultSet result = preparedStatement.executeQuery();
 
             while (result.next()) {
                 if (ticket.equals(result.getString("ticket"))) {
+                    CACHE.put(mail, ticket);
                     return true;
                 }
             }
-
         }
 
         return false;
