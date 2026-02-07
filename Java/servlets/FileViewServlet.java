@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import accessibility.AccessibilityHandler;
 import utility.*;
 
 public class FileViewServlet extends HttpServlet {
@@ -51,10 +52,11 @@ public class FileViewServlet extends HttpServlet {
 
         String userDataPath = serverRootDir + mail;
         File userFileObj = new File(userDataPath + dir);
+        File requestedFile;
 
         switch (method) {
             case "listFiles":
-                File requestedFile = new File(userDataPath + "/" + dir);
+                requestedFile = new File(userDataPath + "/" + dir);
                 if (requestedFile.exists()) {
                     JSONArray fileArray = new JSONArray();
 
@@ -73,14 +75,37 @@ public class FileViewServlet extends HttpServlet {
                     Utils.sendFailureResp(out, new JSONObject(), "Folder not exists");
                 }
                 break;
+        case "listSharedFiles":
+            String sharedMainDir = request.getParameter("sharedMainDir");
+            String subDirs = request.getParameter("sharedSubDirs");
+            requestedFile = new File(serverRootDir + sharedMainDir + subDirs);
+            System.out.println(requestedFile.getAbsolutePath());
+            requestedFile = new File(serverRootDir + sharedMainDir + subDirs);
+            if (requestedFile.exists()) {
+                try {
+                    AccessibilityHandler.getInstance().checkAccessible(sharedMainDir, mail);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                String owner = sharedMainDir.split("/")[0];
+                JSONArray fileArray = new JSONArray();
+                for (File file : requestedFile.listFiles()) {
+                    JSONObject obj = new JSONObject();
+                    obj.put("name", file.getName());
+                    obj.put("type", file.isDirectory() ? "folder" : getExtention(file));
+                    obj.put("size", Utils.properSize(file.length()));
+                    obj.put("lastMod", new Date(file.lastModified()));
+                    obj.put("owner", owner);
+                    fileArray.put(obj);
+                }
+                Utils.sendSuccessResp(out, new JSONObject().put("files", fileArray));
+            } else {
+                Utils.sendFailureResp(out, new JSONObject(), "Folder not exists");
+            }
+            break;
 
             default:
                 break;
         }
-    }
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        PrintWriter out = response.getWriter();
     }
 }

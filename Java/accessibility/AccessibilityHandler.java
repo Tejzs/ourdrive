@@ -1,6 +1,9 @@
 package accessibility;
 
 import mysql.SqlConnectionFactory;
+import utility.Utils;
+
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.sql.Connection;
@@ -20,7 +23,15 @@ public class AccessibilityHandler {
     }
 
     public void registerAccessCode(String code, String folder, String mail) throws SQLException {
-        PreparedStatement pstmt = con.prepareStatement("INSERT INTO ShareRecords VALUES (?, ?, ?)");
+        PreparedStatement pstmt = con.prepareStatement("SELECT shareid FROM ShareRecords WHERE owner = ? AND folder = ?");
+        pstmt.setString(1, mail);
+        pstmt.setString(2, folder);
+        ResultSet rs = pstmt.executeQuery();
+        if (rs.next()) {
+            throw new IllegalArgumentException("Code already generated for folder: " + folder);
+        }
+
+        pstmt = con.prepareStatement("INSERT INTO ShareRecords VALUES (?, ?, ?)");
         pstmt.setString(1, code);
         pstmt.setString(2, mail);
         pstmt.setString(3, folder);
@@ -51,7 +62,7 @@ public class AccessibilityHandler {
         if (rs.next()) {
             String currCodes = rs.getString("contents");
             if (currCodes.contains(code)) {
-                return;
+                throw new RuntimeException("Code already activated");
             }
             currCodes += "," + code;
             pstmt = con.prepareStatement("UPDATE AccessibleContent SET contents = ? WHERE mail = ?");
@@ -80,20 +91,93 @@ public class AccessibilityHandler {
         }
     }
 
-    public JSONObject listAccessibleFolders(String mail) throws SQLException {
+    public JSONArray listAccessibleFolders(String mail) throws SQLException {
         PreparedStatement pstmt = con.prepareStatement("SELECT contents FROM AccessibleContent WHERE mail = ?");
         pstmt.setString(1, mail);
         ResultSet rs = pstmt.executeQuery();
 
-        JSONObject data = new JSONObject();
+        JSONArray data = new JSONArray();
         if (rs.next()) {
             String currCodes = rs.getString("contents");
             String[] codes = currCodes.split(",");
             for (String code : codes) {
-                data.put(code, getPathForCode(code));
+                data.put(getPathForCode(code));
             }
         }
 
         return data;
+    }
+
+    public void checkAccessible(String folder, String mail) throws SQLException {
+        String owner = folder.split("/")[0];
+        String dir = folder.substring(folder.indexOf("/"));
+
+        PreparedStatement pstmt = con.prepareStatement("SELECT shareid FROM ShareRecords WHERE owner = ? AND folder = ?");
+        pstmt.setString(1, owner);
+        pstmt.setString(2, dir);
+
+        ResultSet rs = pstmt.executeQuery();
+        String code;
+        if (rs.next()) {
+            code = rs.getString("shareid");
+        } else {
+            throw new IllegalArgumentException("The folder isn't accessible");
+        }
+
+        pstmt = con.prepareStatement("SELECT contents FROM AccessibleContent WHERE mail = ?");
+        pstmt.setString(1, mail);
+
+        rs = pstmt.executeQuery();
+
+        if (rs.next()) {
+            String codes = rs.getString("contents");
+            if (Utils.stringIsEmpty(codes) || !codes.contains(code)) {
+                throw new IllegalArgumentException("The folder isn't accessible");
+            }
+        } else {
+            throw new IllegalArgumentException("The folder isn't accessible");
+        }
+    }
+
+    public JSONObject getCreatedTokens(String mail) throws SQLException {
+        PreparedStatement pstmt = con.prepareStatement("SELECT shareid, folder FROM ShareRecords WHERE owner = ?");
+        pstmt.setString(1, mail);
+        ResultSet rs = pstmt.executeQuery();
+        JSONObject data = new JSONObject();
+        while (rs.next()) {
+            data.put(rs.getString("shareid"), rs.getString("folder"));
+        }
+        return data;
+    }
+
+    public void deleteToken(String mail, String code) throws SQLException {
+        PreparedStatement pstmt = con.prepareStatement("SELECT folder FROM ShareRecords WHERE owner = ? AND shareid = ?");
+        pstmt.setString(1, mail);
+        pstmt.setString(2, code);
+        ResultSet rs = pstmt.executeQuery();
+
+        if (!rs.next()) {
+            throw new IllegalArgumentException("Not owner of code or code not found");
+        }
+
+        pstmt = con.prepareStatement("DELETE FROM ShareRecords WHERE owner = ? AND shareid = ?");
+        pstmt.setString(1, mail);
+        pstmt.setString(2, code);
+        pstmt.executeUpdate();
+
+        pstmt = con.prepareStatement("SELECT * FROM AccessibleContent WHERE contents LIKE '%" + code + "%'");
+        rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            String contents = rs.getString("contents");
+            String mail1 = rs.getString("mail");
+            contents = contents.replaceAll("," + code, "");
+            contents = contents.replaceAll(code + ",", "");
+
+            pstmt = con.prepareStatement("UPDATE AccessibleContent SET contents = ? WHERE mail = ?");
+            pstmt.setString(1, contents);
+            pstmt.setString(2, mail1);
+            pstmt.executeUpdate();
+        }
     }
 }

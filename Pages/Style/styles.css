@@ -27,6 +27,10 @@ body {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
 }
 
+.signin-form a {
+  color: #8ab4f8;
+}
+
 .signin-form h1 {
   text-align: center;
   margin-bottom: 22px;
@@ -228,7 +232,6 @@ input {
 }
 
 .options a {
-  font-size: 1.18em;
   cursor: pointer;
 }
 
@@ -243,7 +246,6 @@ input {
 
 .file-upload {
   flex-shrink: 0;
-  /* prevents shrinking */
   margin-right: 15px;
   position: relative;
 }
@@ -259,10 +261,14 @@ input {
   font-size: 15px;
   background: #222;
   color: white;
-  padding: 6px 10px;
+  padding: 6px 8px;
   border-radius: 5px;
   border: 1px solid #444;
   transition: all 0.2s ease;
+}
+
+.file-upload span svg {
+  transform: translateY(3px);
 }
 
 .file-upload:hover span {
@@ -317,7 +323,8 @@ input {
 .progress-tab {
   grid-area: progress;
   display: grid;
-  grid-template-rows: 1fr 1fr; /* top & bottom */
+  grid-template-rows: 1fr 1fr;
+  /* top & bottom */
 }
 
 .progress-tab {
@@ -332,11 +339,13 @@ input {
   padding: 15px;
   border-radius: 5px;
   border: 1px solid #444;
-  margin: 15px  ;
+  margin: 15px;
+
   * {
     z-index: 3;
   }
 }
+
 .chunk-status,
 .upload-progress {
   border-left: 1px solid #444;
@@ -525,24 +534,24 @@ label.start-btn {
 
 #chunk-size {
   box-sizing: border-box;
-  height: 36px;
-  line-height: 36px;
+  height: 30.8px;
   flex-shrink: 0;
   margin-right: 15px;
   font-size: 15px;
   background: #222;
   color: white;
-  padding: 0 28px 0 10px;    /* space for arrow */
+  padding: 0 28px 0 10px;
   border-radius: 5px;
   border: 1px solid #444;
   outline: none;
+  transform: translateY(0.2px);
 }
 
 #chunk-size:focus,
 #chunk-size:focus-visible {
   outline: none;
   box-shadow: none;
-  border-color: #444; /* keep same */
+  border-color: #444;
 }
 
 
@@ -565,16 +574,13 @@ label.start-btn {
   font-size: 15px;
   cursor: pointer;
   padding: 5px 8px;
-  border-radius: 5px;
-  transition:
-    #111 0.2s ease,
-    color 0.2s ease;
 }
 
 .new-folder {
   margin-right: 15px;
   display: inline-flex;
   align-items: center;
+  font-size: 15px;
 }
 
 .new-folder span,
@@ -628,7 +634,7 @@ label.start-btn {
   width: 360px;
   padding: 28px 32px;
   background: #1c1c20;
-  border-radius: 12px;
+  border-radius: 5px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
 }
@@ -735,14 +741,12 @@ label.start-btn {
   margin-top: 4px;
 }
 
-/* Buttons */
 .modal-actions {
   display: flex;
   gap: 12px;
   margin-top: 26px;
 }
 
-/* shared button base */
 .modal-actions button {
   flex: 1;
   padding: 10px;
@@ -750,12 +754,12 @@ label.start-btn {
   border: none;
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;}
+  cursor: pointer;
+}
 
-/* Confirm */
 .modal-actions .confirm-btn {
-  background: #6ea8fe;        /* softer blue */
-  color: #0b1220;    
+  background: #6ea8fe;
+  color: #0b1220;
 }
 
 .modal-actions .confirm-btn:hover {
@@ -770,7 +774,6 @@ label.start-btn {
   transform: scale(0.97);
 }
 
-/* Top-left close (X) button */
 .modal-close {
   position: absolute;
   top: 6px;
@@ -782,7 +785,7 @@ label.start-btn {
   border: none;
 
   background: inherit;
-  color: hsla(0,0%,100%,.4);
+  color: hsla(0, 0%, 100%, .4);
 
   font-size: 18px;
   font-weight: 500;
@@ -794,11 +797,11 @@ label.start-btn {
 }
 
 .modal-close:hover {
-  color: hsla(0,0%,100%,.5);
+  color: hsla(0, 0%, 100%, .5);
 }
 
 .modal-close:active {
-  color: hsla(0,0%,100%,.4);
+  color: hsla(0, 0%, 100%, .4);
 }
 
 .usage {
@@ -837,4 +840,70 @@ label.start-btn {
 .download:active a {
   background: #111;
   transform: scale(0.98);
+}
+
+.sharedDropDown {
+  display: none;
+  position: absolute;
+  top: 185px;
+  font-size: 15px;
+  padding: 0 8px 0 8px;
+  background: #1c1c20;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+}
+
+.sharedDropDown span {
+  display: block;
+  padding: 5px;
+  margin: 5px 0 5px 0;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.sharedDropDown span:hover {
+  background-color: #2a2a2c;
+}
+
+.showCreated {
+  display: none;
+  position: absolute;
+  top: 137px;
+  left: 164px;
+  font-size: 15px;
+  padding: 0 8px 0 8px;
+  background: #1c1c20;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+  gap: 5px;
+}
+
+.showCreated .cancel-btn svg {
+  transform: translate(-30px, -4px);
+  z-index: 99;
+  cursor: pointer;
+  color: #f85149;
+}
+
+.showCreated span {
+  padding: 5px 5px 5px 30px;
+  margin: 5px 0 5px 0;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+.showCreated span:hover {
+  background-color: #2a2a2c;
+}
+
+.dropIcon svg {
+  color: #8ab4f8;
+  margin-left: auto;
+  transform: translateY(1px);
 }
