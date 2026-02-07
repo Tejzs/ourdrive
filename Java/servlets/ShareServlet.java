@@ -43,6 +43,11 @@ public class ShareServlet extends HttpServlet {
             case "createdTokens":
                 Utils.sendSuccessResp(out, new JSONObject().put("tokens", AccessibilityHandler.getInstance().getCreatedTokens(mail)));
                 break;
+            case "delete":
+                code = request.getParameter("token");
+                AccessibilityHandler.getInstance().deleteToken(mail, code);
+                Utils.sendSuccessResp(out, new JSONObject());
+                break;
             default:
                 Utils.sendFailureResp(out, new JSONObject(), "Method not implemented: " + method);
                 break;

@@ -149,4 +149,35 @@ public class AccessibilityHandler {
         }
         return data;
     }
+
+    public void deleteToken(String mail, String code) throws SQLException {
+        PreparedStatement pstmt = con.prepareStatement("SELECT folder FROM ShareRecords WHERE owner = ? AND shareid = ?");
+        pstmt.setString(1, mail);
+        pstmt.setString(2, code);
+        ResultSet rs = pstmt.executeQuery();
+
+        if (!rs.next()) {
+            throw new IllegalArgumentException("Not owner of code or code not found");
+        }
+
+        pstmt = con.prepareStatement("DELETE FROM ShareRecords WHERE owner = ? AND shareid = ?");
+        pstmt.setString(1, mail);
+        pstmt.setString(2, code);
+        pstmt.executeUpdate();
+
+        pstmt = con.prepareStatement("SELECT * FROM AccessibleContent WHERE contents LIKE '%" + code + "%'");
+        rs = pstmt.executeQuery();
+
+        while (rs.next()) {
+            String contents = rs.getString("contents");
+            String mail1 = rs.getString("mail");
+            contents = contents.replaceAll("," + code, "");
+            contents = contents.replaceAll(code + ",", "");
+
+            pstmt = con.prepareStatement("UPDATE AccessibleContent SET contents = ? WHERE mail = ?");
+            pstmt.setString(1, contents);
+            pstmt.setString(2, mail1);
+            pstmt.executeUpdate();
+        }
+    }
 }
