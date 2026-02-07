@@ -30,8 +30,7 @@ public class ShareServlet extends HttpServlet {
         try {
             switch (method) {
             case "create":
-                if (!new File(Utils.getServerHomeInServer(getServletContext()) + "Files/" + folder).exists()) {
-                    System.out.println(getServletContext() + "Files/" + folder);
+                if (!new File(Utils.getServerHomeInServer(getServletContext()) + "Files/" + mail + folder).exists()) {
                     throw new IllegalArgumentException("Folder does not exist");
                 }
                 AccessibilityHandler.getInstance().registerAccessCode(code, folder, mail);
@@ -40,6 +39,9 @@ public class ShareServlet extends HttpServlet {
             case "list":
                 Utils.sendSuccessResp(out, new JSONObject().put("data",
                         AccessibilityHandler.getInstance().listAccessibleFolders(mail)));
+                break;
+            case "createdTokens":
+                Utils.sendSuccessResp(out, new JSONObject().put("tokens", AccessibilityHandler.getInstance().getCreatedTokens(mail)));
                 break;
             default:
                 Utils.sendFailureResp(out, new JSONObject(), "Method not implemented: " + method);

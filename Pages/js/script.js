@@ -278,7 +278,8 @@ function renderTable(files, tbody) {
         let nextDir;
         console.log(file.name);
         if (currentDir) {
-          nextDir = currentDir + "/" + file.name;
+          let apnd = currentDir.endsWith("/") ? "" : "/";
+          nextDir = currentDir + apnd + file.name;
         } else {
           nextDir = file.name;
         }

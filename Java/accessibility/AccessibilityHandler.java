@@ -4,6 +4,7 @@ import mysql.SqlConnectionFactory;
 import utility.Utils;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -136,5 +137,16 @@ public class AccessibilityHandler {
         } else {
             throw new IllegalArgumentException("The folder isn't accessible");
         }
+    }
+
+    public JSONObject getCreatedTokens(String mail) throws SQLException {
+        PreparedStatement pstmt = con.prepareStatement("SELECT shareid, folder FROM ShareRecords WHERE owner = ?");
+        pstmt.setString(1, mail);
+        ResultSet rs = pstmt.executeQuery();
+        JSONObject data = new JSONObject();
+        while (rs.next()) {
+            data.put(rs.getString("shareid"), rs.getString("folder"));
+        }
+        return data;
     }
 }
