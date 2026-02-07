@@ -24,7 +24,11 @@ public class FileAccessFilter extends HttpFilter {
         if ((main = servletRequest.getParameter("sharedMain")) != null) {
             try {
                 AccessibilityHandler.getInstance().checkAccessible(main, mail);
+                if (!requestURI.startsWith(main)) {
+                    servletResponse.sendRedirect(Properties.getAppSubPath() + "Pages/unauthorized.html");
+                }
                 filterChain.doFilter(servletRequest, servletResponse);
+                return;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
