@@ -574,10 +574,6 @@ label.start-btn {
   font-size: 15px;
   cursor: pointer;
   padding: 5px 8px;
-  border-radius: 5px;
-  transition:
-    #111 0.2s ease,
-    color 0.2s ease;
 }
 
 .new-folder {
@@ -849,10 +845,9 @@ label.start-btn {
 .sharedDropDown {
   display: none;
   position: absolute;
-  margin-top: 150px;
+  top: 185px;
   font-size: 15px;
   padding: 0 8px 0 8px;
-  width: fit-content;
   background: #1c1c20;
   border-radius: 5px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -862,7 +857,6 @@ label.start-btn {
 
 .sharedDropDown span {
   display: block;
-  width: 250px;
   padding: 5px;
   margin: 5px 0 5px 0;
   border-radius: 5px;
@@ -871,4 +865,45 @@ label.start-btn {
 
 .sharedDropDown span:hover {
   background-color: #2a2a2c;
+}
+
+.showCreated {
+  display: none;
+  position: absolute;
+  top: 137px;
+  left: 164px;
+  font-size: 15px;
+  padding: 0 8px 0 8px;
+  background: #1c1c20;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  z-index: 10;
+  gap: 5px;
+}
+
+.showCreated .cancel-btn svg {
+  transform: translate(-30px, -4px);
+  z-index: 99;
+  cursor: pointer;
+  color: #f85149;
+}
+
+.showCreated span {
+  padding: 5px 5px 5px 30px;
+  margin: 5px 0 5px 0;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  gap: 10px;
+}
+
+.showCreated span:hover {
+  background-color: #2a2a2c;
+}
+
+.dropIcon svg {
+  color: #8ab4f8;
+  margin-left: auto;
+  transform: translateY(1px);
 }

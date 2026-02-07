@@ -236,7 +236,11 @@ function renderTable(files, tbody) {
     const dLabel = document.createElement("label");
     dLabel.className = "download";
     const dA = document.createElement("a");
-    dA.href = `./Files/tejasvishnusv@gmail.com/${encodeURIComponent(file.name)}`;
+    if (currentSpace == "User") {
+      dA.href = `./Files/${root.innerHTML}/${pathStack.join("/")}/${encodeURIComponent(file.name)}`;
+    } else {
+      dA.href = `./Files/${rootPath.innerHTML}${pathStack.join("/")}/${encodeURIComponent(file.name)}?sharedMain=${currentSpace}`;
+    }
     dA.download = file.name;
     dA.innerHTML = `
     <svg width="15" height="15" viewBox="0 0 16 16"
@@ -475,9 +479,10 @@ function selectAll() {
   }
 }
 
+let root;
 function updateProfile() {
   let profile = document.getElementById("profile");
-  let root = document.getElementById("root");
+  root = document.getElementById("root");
   let rootPath = document.getElementById("rootPath");
   fetch(`./user?method=currUser`)
     .then((response) => {
@@ -942,6 +947,7 @@ function newFolder() {
           Logger.failure("Error creating folder");
         }
       });
+    document.getElementById("folderInput").value = "";
   }
   else {
     Logger.failure("Failed to create new folder");
@@ -1200,7 +1206,7 @@ function share() {
     return;
   }
 
-  fetch(`./share?method=create&folder=/${currentDir}/`)
+  fetch(`./share?method=create&folder=/${currentDir}`)
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {
@@ -1224,14 +1230,16 @@ function showShared() {
 
         data.data.forEach(element => {
           let span = document.createElement("span");
-          span.innerText = element;
+          span.innerText = element
+            .replace(/\/+/g, "/")
+            .replace(/\/$/, "");
           span.addEventListener("click", () => {
             switchSpace(element);
           });
           dropdown.append(span);
         });
       } else {
-        Logger.failure("Error compressing file/files");
+        Logger.failure("Failed to retrieve shared");
       }
     });
 }
@@ -1252,6 +1260,7 @@ function enterCode() {
         Logger.failure("Invalid Code");
       }
     });
+  document.getElementById("codeInput").value = "";
 }
 
 function switchSpace(path) {
@@ -1278,4 +1287,50 @@ document.addEventListener('click', (e) => {
   if (!document.getElementById("options").contains(e.target) && !document.getElementById("shareSelect").contains(e.target)) {
     document.getElementById("shareSelect").style.display = 'none';
   }
+  if (!document.getElementById("showCreatedBtn").contains(e.target) && !document.getElementById("showCreated").contains(e.target)) {
+    document.getElementById("showCreated").style.display = 'none';
+  }
 });
+
+let showCreatedDropDown = document.getElementById("showCreated");
+function showCreated() {
+  showCreatedDropDown.style.display = showCreatedDropDown.style.display === 'block' ? 'none' : 'block';
+  fetch(`./share?method=createdTokens`)
+    .then((resp) => resp.json())
+    .then((data) => {
+      if (data.status == "success") {
+        showCreatedDropDown.innerHTML = "";
+        for (let token in data.tokens) {
+          let closeSpan = document.createElement("button");
+          closeSpan.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M8.70701 8.00001L12.353 4.35401C12.548 4.15901 12.548 3.84201 12.353 3.64701C12.158 3.45201 11.841 3.45201 11.646 3.64701L8.00001 7.29301L4.35401 3.64701C4.15901 3.45201 3.84201 3.45201 3.64701 3.64701C3.45201 3.84201 3.45201 4.15901 3.64701 4.35401L7.29301 8.00001L3.64701 11.646C3.45201 11.841 3.45201 12.158 3.64701 12.353C3.74501 12.451 3.87301 12.499 4.00101 12.499C4.12901 12.499 4.25701 12.45 4.35501 12.353L8.00101 8.70701L11.647 12.353C11.745 12.451 11.873 12.499 12.001 12.499C12.129 12.499 12.257 12.45 12.355 12.353C12.55 12.158 12.55 11.841 12.355 11.646L8.70901 8.00001H8.70701Z"/></svg>`;
+          closeSpan.className = "cancel-btn";
+          closeSpan.addEventListener('click', () => {
+            console.log("asdas")
+            fetch(`./share?method=delete&token=${token}`)
+              .then((resp) => resp.json())
+              .then((data) => {
+                if (data.status == "success") {
+                  showCreated();
+                } else {
+                  Logger.failure("Invalid Code");
+                }
+              });
+          })
+          let span = document.createElement("span");
+          span.className = "dropIcon";
+          span.innerHTML = root.innerText + data.tokens[token]
+            .replace(/\/+/g, "/")
+            .replace(/\/$/, "") + `<svg width="15" height="15" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M3 5V12.73C2.4 12.38 2 11.74 2 11V5C2 2.79 3.79 1 6 1H9C9.74 1 10.38 1.4 10.73 2H6C4.35 2 3 3.35 3 5ZM11 15H6C4.897 15 4 14.103 4 13V5C4 3.897 4.897 3 6 3H11C12.103 3 13 3.897 13 5V13C13 14.103 12.103 15 11 15ZM12 5C12 4.448 11.552 4 11 4H6C5.448 4 5 4.448 5 5V13C5 13.552 5.448 14 6 14H11C11.552 14 12 13.552 12 13V5Z"/></svg>`;
+          span.addEventListener('click', () => {
+            navigator.clipboard.writeText(token)
+              .then(() => console.log("Copied:", token))
+              .catch(err => console.error("Copy failed", err));
+          });
+          span.append(closeSpan);
+          showCreatedDropDown.append(span);
+        }
+      } else {
+        Logger.failure("Failed to retrieve shared");
+      }
+    });
+}
