@@ -1228,6 +1228,7 @@ function showShared() {
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {
+        if (element == "") return
         while (dropdown.children.length > 1) {
           dropdown.removeChild(options.children[1]);
         }
