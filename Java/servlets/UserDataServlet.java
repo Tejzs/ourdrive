@@ -18,6 +18,7 @@ public class UserDataServlet extends HttpServlet {
 
     private String baseDir = "";
     private final long gb = 1024 * 1024 * 1024;
+
     @Override
     public void init() {
         baseDir = Utils.getServerHomeInServer(getServletContext()) + "Files" + File.separatorChar;
@@ -30,6 +31,7 @@ public class UserDataServlet extends HttpServlet {
 
         String method = request.getParameter("method");
         String mail = SessionData.getThreadLocalSessionData().getMail();
+        String currentSpace;
 
         try {
             switch (method) {
@@ -38,12 +40,18 @@ public class UserDataServlet extends HttpServlet {
                     break;
 
                 case "freeSpace":
-                    File drive = new File(baseDir + File.separatorChar + mail + File.separatorChar);
+                    currentSpace = request.getParameter("currentSpace");
+                    File drive;
+                    if (currentSpace.equals("User")) {
+                        drive = new File(baseDir + File.separatorChar + mail + File.separatorChar);
+                    } else {
+                        drive = new File(baseDir + File.separatorChar + currentSpace);
+                    }
                     long totalSpace = drive.getTotalSpace();
                     long userUsed = FileUtils.sizeOfDirectory(drive);
                     long freeSpace = drive.getFreeSpace();
                     JSONObject fileArray = new JSONObject();
-                    fileArray.put("currUser", mail);
+
                     fileArray.put("userUsed", Utils.properSize(userUsed));
                     fileArray.put("freeSpace", Utils.properSize(totalSpace - freeSpace));
                     fileArray.put("totalSpace", Utils.properSize(totalSpace));
