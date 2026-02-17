@@ -1,10 +1,7 @@
 package servlets;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -16,13 +13,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.annotation.MultipartConfig;
 
+import init.Factory;
 import org.json.JSONObject;
 
 import utility.*;
-import utility.file.FileChunker;
+import utility.DFS.*;
 import meta.FileUploadMeta;
 import operations.FileOperations;
 import storage.DataStorage;
+
 
 @MultipartConfig(
     fileSizeThreshold = 0,
@@ -36,8 +35,8 @@ public class ChunkUploadServlet extends HttpServlet {
 
     @Override
     public void init() {
-        tempUploadDir = Utils.getServerHomeInServer(getServletContext()) + "UploadedChunkStorage";
-        storageDir = Utils.getServerHomeInServer(getServletContext()) + "Files" + File.separatorChar;
+        tempUploadDir = "/UploadedChunkStorage";
+        storageDir = "/Files";
     }
 
     @Override
@@ -98,34 +97,44 @@ public class ChunkUploadServlet extends HttpServlet {
             return;
         }
 
-        String storePath = storageDir + mail + File.separatorChar + fileUploadMeta.getDestination();
-        String userStorageDir = storePath + File.separatorChar;
+        String storePath = storageDir + File.separatorChar + mail + File.separatorChar + fileUploadMeta.getDestination();
 
         Part chunkPart = req.getPart("chunk");
 
-        File uploadDir = new File(tempUploadDir, uploadId);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
+//        if(Factory.getClient().exists("", tempUploadDir)) {
+            Factory.getClient().createTemp(uploadId);
+//        }
+//        else {
+//            Factory.getClient().mkdir("", tempUploadDir);
+//            Factory.getClient().createTemp(uploadId);
+//        }
 
-        File chunkFile = new File(
-                uploadDir,
-                "chunk_" + chunkIndex + ".dat"
-        );
+//        File uploadDir = new File(tempUploadDir, uploadId);
+//        if (!uploadDir.exists()) uploadDir.mkdirs();
+//
+//        File chunkFile = new File(
+//                uploadDir,
+//                "chunk_" + chunkIndex + ".dat"
+//        );
+//
+//        try (InputStream in = chunkPart.getInputStream();
+//             OutputStream outStream = new FileOutputStream(chunkFile)) {
+//
+//            byte[] buffer = new byte[8192];
+//            int len;
+//            while ((len = in.read(buffer)) != -1) {
+//                outStream.write(buffer, 0, len);
+//            }
+//        }
 
-        try (InputStream in = chunkPart.getInputStream();
-             OutputStream outStream = new FileOutputStream(chunkFile)) {
+        Factory.getClient().uploadChunks("chunk_" + chunkIndex + ".dat", uploadId, chunkPart.getInputStream(), (int)fileUploadMeta.getChunkSize());
 
-            byte[] buffer = new byte[8192];
-            int len;
-            while ((len = in.read(buffer)) != -1) {
-                outStream.write(buffer, 0, len);
-            }
-        }
         chunkIndex++;
 
         if (chunkIndex == fileUploadMeta.getTotalChunks()) {
             DataStorage.getFileUploadMetaStore().delete(uploadId);
-            String filename = Utils.getNonDuplicateFileName(storePath, fileUploadMeta.getFilename());
-            mergeChunks(storePath + File.separatorChar + filename, uploadDir.getAbsolutePath());
+            String filename = storePath + fileUploadMeta.getFilename();
+            mergeChunks("/UploadedChunkStorage/" + uploadId, filename);
             return;
         }
 
@@ -134,7 +143,7 @@ public class ChunkUploadServlet extends HttpServlet {
         Utils.sendSuccessResp(out, new JSONObject());
     }
 
-    private void mergeChunks(String newFile, String tempDir)
+    private void mergeChunks(String tempDir, String newFile)
             throws IOException {
 
         FileOperations.startUnChunkingFolder(tempDir, newFile);

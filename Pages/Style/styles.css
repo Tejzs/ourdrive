@@ -602,6 +602,15 @@ label.start-btn {
   border-radius: 6px 0 0 6px;
 }
 
+.new-folder .dropdown {
+  padding: 0 10px;
+  background-color: #222;
+  border-radius: 0 6px 6px 0;
+  color: #fff;
+  border: 1px solid #444;
+  border-left: none;
+}
+
 .new-folder input {
   padding: 0 10px;
   background-color: #222;
@@ -829,7 +838,11 @@ label.start-btn {
 }
 
 .usage {
-  margin-left: 15px;
+  position: fixed;
+  bottom: 0;
+  left: 0;          /* or adjust if you have sidebar */
+  width: 100%;
+  margin: 15px;
   font-size: 15px;
 }
 
@@ -895,7 +908,7 @@ label.start-btn {
   display: none;
   position: absolute;
   top: 137px;
-  left: 164px;
+  left: 503px;
   font-size: 15px;
   padding: 0 8px 0 8px;
   background: #1c1c20;
@@ -929,5 +942,27 @@ label.start-btn {
 .dropIcon svg {
   color: #8ab4f8;
   margin-left: auto;
+}
+
+svg {
   transform: translateY(1px);
+}
+
+@media (max-width: 1416px) {
+  .main {
+    display: grid;
+    grid-template-areas:
+      "nav nav"
+      "toolbar null"
+      "header header"
+      "tableContainer tableContainer";
+    grid-template-columns: 1fr 25%;
+    grid-template-rows: auto auto auto 1fr auto;
+    gap: 5px;
+    height: calc(100vh - 10px);
+  }
+
+  .progress-tab {
+    display: none;
+  }
 }

@@ -4,9 +4,9 @@ const Logger = {
 
   // Mapping types to simple emoji icons
   icons: {
-    info: 'ℹ',
-    success: '✔',
-    failure: '🗙'
+    info: '<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M8.49902 7.49998C8.49902 7.22384 8.27517 6.99998 7.99902 6.99998C7.72288 6.99998 7.49902 7.22384 7.49902 7.49998V10.5C7.49902 10.7761 7.72288 11 7.99902 11C8.27517 11 8.49902 10.7761 8.49902 10.5V7.49998ZM8.74807 5.50001C8.74807 5.91369 8.41271 6.24905 7.99903 6.24905C7.58535 6.24905 7.25 5.91369 7.25 5.50001C7.25 5.08633 7.58535 4.75098 7.99903 4.75098C8.41271 4.75098 8.74807 5.08633 8.74807 5.50001ZM8 1C4.13401 1 1 4.13401 1 8C1 11.866 4.13401 15 8 15C11.866 15 15 11.866 15 8C15 4.13401 11.866 1 8 1ZM2 8C2 4.68629 4.68629 2 8 2C11.3137 2 14 4.68629 14 8C14 11.3137 11.3137 14 8 14C4.68629 14 2 11.3137 2 8Z"/></svg>',
+    success: '<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M13.6572 3.13573C13.8583 2.9465 14.175 2.95614 14.3643 3.15722C14.5535 3.35831 14.5438 3.675 14.3428 3.86425L5.84277 11.8642C5.64597 12.0494 5.33756 12.0446 5.14648 11.8535L1.64648 8.35351C1.45121 8.15824 1.45121 7.84174 1.64648 7.64647C1.84174 7.45121 2.15825 7.45121 2.35351 7.64647L5.50976 10.8027L13.6572 3.13573Z"/></svg>',
+    failure: '<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M8.70701 8.00001L12.353 4.35401C12.548 4.15901 12.548 3.84201 12.353 3.64701C12.158 3.45201 11.841 3.45201 11.646 3.64701L8.00001 7.29301L4.35401 3.64701C4.15901 3.45201 3.84201 3.45201 3.64701 3.64701C3.45201 3.84201 3.45201 4.15901 3.64701 4.35401L7.29301 8.00001L3.64701 11.646C3.45201 11.841 3.45201 12.158 3.64701 12.353C3.74501 12.451 3.87301 12.499 4.00101 12.499C4.12901 12.499 4.25701 12.45 4.35501 12.353L8.00101 8.70701L11.647 12.353C11.745 12.451 11.873 12.499 12.001 12.499C12.129 12.499 12.257 12.45 12.355 12.353C12.55 12.158 12.55 11.841 12.355 11.646L8.70901 8.00001H8.70701Z"/></svg>'
   },
 
   _getContainer() {
@@ -560,7 +560,7 @@ function getActiveTasks() {
         let parentDiv = document.createElement("div");
 
         let cancelBtn = document.createElement("button");
-        cancelBtn.innerHTML = "🗙";
+        cancelBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M8.70701 8.00001L12.353 4.35401C12.548 4.15901 12.548 3.84201 12.353 3.64701C12.158 3.45201 11.841 3.45201 11.646 3.64701L8.00001 7.29301L4.35401 3.64701C4.15901 3.45201 3.84201 3.45201 3.64701 3.64701C3.45201 3.84201 3.45201 4.15901 3.64701 4.35401L7.29301 8.00001L3.64701 11.646C3.45201 11.841 3.45201 12.158 3.64701 12.353C3.74501 12.451 3.87301 12.499 4.00101 12.499C4.12901 12.499 4.25701 12.45 4.35501 12.353L8.00101 8.70701L11.647 12.353C11.745 12.451 11.873 12.499 12.001 12.499C12.129 12.499 12.257 12.45 12.355 12.353C12.55 12.158 12.55 11.841 12.355 11.646L8.70901 8.00001H8.70701Z"/></svg>`;
         cancelBtn.className = "cancel-btn";
         cancelBtn.onclick = () => {
           cancelUpload(file.uploadId);
@@ -1215,8 +1215,11 @@ function share() {
     .then((data) => {
       if (data.status == "success") {
         console.log("shared: " + data.code);
+        navigator.clipboard.writeText(data.code)
+          .then(() => Logger.success("Coppied code to clipboard"))
+          .catch(err => Logger.failure(err));
       } else {
-        Logger.failure("Error compressing file/files");
+        Logger.failure("Failed to share folders");
       }
     });
 }
@@ -1228,12 +1231,12 @@ function showShared() {
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {
-        if (element == "") return
         while (dropdown.children.length > 1) {
           dropdown.removeChild(options.children[1]);
         }
 
         data.data.forEach(element => {
+          if (element == "") return
           let span = document.createElement("span");
           span.innerText = element
             .replace(/\/+/g, "/")
@@ -1260,7 +1263,7 @@ function enterCode() {
     .then((resp) => resp.json())
     .then((data) => {
       if (data.status == "success") {
-        console.log("got codes")
+        Logger.success("Shared space added")
       } else {
         Logger.failure("Invalid Code");
       }
@@ -1294,7 +1297,7 @@ document.addEventListener('click', (e) => {
   if (!document.getElementById("options").contains(e.target) && !document.getElementById("shareSelect").contains(e.target)) {
     document.getElementById("shareSelect").style.display = 'none';
   }
-  if (!document.getElementById("showCreatedBtn").contains(e.target) && !document.getElementById("showCreated").contains(e.target)) {
+  if (!document.getElementById("showCreatedLabel").contains(e.target) && !document.getElementById("showCreated").contains(e.target)) {
     document.getElementById("showCreated").style.display = 'none';
   }
 });

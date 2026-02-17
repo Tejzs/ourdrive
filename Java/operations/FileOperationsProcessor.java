@@ -73,7 +73,7 @@ public class FileOperationsProcessor implements Runnable {
                 meta.setProcessState(ProcessState.PROCESSING);
                 switch (task) {
                     case UNCHUNK_FROM_FOLDER:
-                        new FileChunker(new File(filePath), new File(newFileNameOrPath), meta).assembleChunksFromFolder();
+                        new FileChunker(filePath, newFileNameOrPath, meta).assembleChunksFromFolder();
                         break;
                     case ZIP:
                         new Zipper(meta).zipFiles();

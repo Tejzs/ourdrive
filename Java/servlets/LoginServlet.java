@@ -9,10 +9,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import init.Factory;
 import org.json.JSONObject;
 
 import auth.Authentication;
 import utility.Utils;
+
 
 public class LoginServlet extends HttpServlet {
     private static final String className = "LoginServlet";
@@ -37,6 +39,7 @@ public class LoginServlet extends HttpServlet {
             if (created) {
                 Utils.sendSuccessResp(out, output);
                 new File(storeDir + File.separatorChar + mail).mkdir();
+                Factory.getClient().mkdir("/Files", mail);
             } else {
                 Utils.sendFailureResp(out, output, "User already exists");
             }
