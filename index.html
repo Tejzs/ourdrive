@@ -5,147 +5,253 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>OurDrive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./Pages/Style/styles.css" />
 </head>
 
 <body>
-  <main>
-    <div class="main">
-      <div class="nav">
-        <h1 id="" class="user">OurDrive</h1>
-        <div class="profile-container">
-          <p id="profile">User</p>
-          <p class="sep"></p>
-          <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
-      </div>
-      <div id="tabSection" class="top-bar">
-        <div id="options" class="options">
-          <label class="file-upload">
-            <span onclick="showShared()"><svg width="15" height="15" viewBox="0 0 16 16"
-                xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-                <path
-                  d="M3.14598 5.85423L7.64598 10.3542C7.84098 10.5492 8.15798 10.5492 8.35298 10.3542L12.853 5.85423C13.048 5.65923 13.048 5.34223 12.853 5.14723C12.658 4.95223 12.341 4.95223 12.146 5.14723L7.99998 9.29323L3.85398 5.14723C3.65898 4.95223 3.34198 4.95223 3.14698 5.14723C2.95198 5.34223 2.95098 5.65923 3.14598 5.85423Z" />
-              </svg></span>
-          </label>
-          <div class="sharedDropDown" id="shareSelect">
-            <span id="root" onclick="userSpace()">root</span>
-          </div>
 
-          <a id="rootPath" class="root" onclick="retrieveRootPath()">root</a>
-          <p id="sep" class="sep">/</p>
-        </div>
-        <select id="chunk-size">
-          <option value="auto">Auto</option>
-          <option value="1">1MB</option>
-          <option value="5">5MB</option>
-          <option value="10">10MB</option>
-          <option value="20">20MB</option>
-          <option value="50">50MB</option>
-          <option value="100">100MB</option>
-          <option value="200">200MB</option>
-        </select>
-        <label class="file-upload">
-          <input onchange="UploadFiles()" type="file" id="fileUpload" multiple />
-          <span>Browse Files</span>
-        </label>
-        <label class="file-upload">
-          <input onchange="uploadFolders()" type="file" id="folderUpload" directory webkitdirectory multiple />
-          <span>Browse Folders (Beta)</span>
-        </label>
+  <!-- ══════════════  NAVBAR  ══════════════ -->
+  <nav class="navbar">
+
+    <!-- Logo (same width as sidebar) -->
+    <div class="navbar-brand">
+      <span class="navbar-logo-icon">☁</span>
+      <span class="navbar-logo-text">OurDrive</span>
+    </div>
+
+    <!--
+      Breadcrumb — #options must keep exactly these 4 initial children
+      so JS switchSpace() check (options.children.length > 4) works.
+      Child 0: chevron label
+      Child 1: #shareSelect dropdown
+      Child 2: #rootPath anchor
+      Child 3: #sep paragraph
+    -->
+    <div id="options" class="breadcrumb">
+      <span class="bc-chevron" onclick="showShared()">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M3.146 5.854a.5.5 0 0 1 .708 0L8 9.793l4.146-3.939a.5.5 0 0 1 .708.708l-4.5 4.276a.5.5 0 0 1-.708 0l-4.5-4.276a.5.5 0 0 1 0-.708z"/>
+        </svg>
+      </span>
+      <div class="sharedDropDown" id="shareSelect">
+        <span id="root" onclick="userSpace()">root</span>
       </div>
-      <div id="tabSection" class="toolbar">
-        <label class="file-upload">
-          <span onclick="deleteSelected()">Delete</span>
-        </label>
-        <label class="file-upload">
-          <span onclick="share()">Share</span>
-        </label>
-        <label id="showCreatedBtn" class="file-upload">
-          <span onclick="showCreated()"><svg width="15" height="15" viewBox="0 0 16 16"
-              xmlns="http://www.w3.org/2000/svg" fill="currentColor">
-              <path
-                d="M3.14598 5.85423L7.64598 10.3542C7.84098 10.5492 8.15798 10.5492 8.35298 10.3542L12.853 5.85423C13.048 5.65923 13.048 5.34223 12.853 5.14723C12.658 4.95223 12.341 4.95223 12.146 5.14723L7.99998 9.29323L3.85398 5.14723C3.65898 4.95223 3.34198 4.95223 3.14698 5.14723C2.95198 5.34223 2.95098 5.65923 3.14598 5.85423Z" />
-            </svg></span>
-        </label>
-        <div class="showCreated" id="showCreated">
+      <a id="rootPath" class="root" onclick="retrieveRootPath()">root</a>
+      <p id="sep" class="sep">/</p>
+    </div>
+
+    <!-- User chip & sign-out -->
+    <div class="navbar-end">
+      <span class="profile-chip" id="profile">User</span>
+      <button class="btn-signout" onclick="logout()">Sign out</button>
+    </div>
+  </nav>
+
+  <!-- ══════════════  APP BODY  ══════════════ -->
+  <div class="app-body">
+
+    <!-- ─── Left Sidebar ─── -->
+    <aside class="sidebar">
+      <div class="sidebar-group-label">Drive</div>
+
+      <button class="sidebar-item active" onclick="userSpace()">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139z"/>
+        </svg>
+        My Drive
+      </button>
+
+      <!-- Storage widget -->
+      <div class="sidebar-storage">
+        <div class="sidebar-group-label" style="margin-top:0;margin-bottom:8px;">Storage</div>
+        <p class="storage-user" id="userUsage"></p>
+        <div class="storage-bar-track">
+          <div class="storage-bar-fill" id="storageBarFill"></div>
         </div>
-        <label class="new-folder">
-          <span onclick="enterCode()">Enter Code</span>
-          <input id="codeInput" class="folder-input" type="text" placeholder="Enter Code" />
-        </label>
-        <label class="file-upload">
-          <span onclick="openModal()">Compress</span>
-        </label>
-        <label class="new-folder">
-          <span onclick="newFolder()">New Folder</span>
-          <input id="folderInput" class="folder-input" type="text" placeholder="Enter Folder Name" />
-        </label>
+        <p class="storage-server" id="usage"></p>
       </div>
+    </aside>
+
+    <!-- ─── Main Column ─── -->
+    <main class="main-col">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+
+        <!-- Upload group -->
+        <div class="toolbar-group">
+          <label class="file-upload">
+            <input onchange="UploadFiles()" type="file" id="fileUpload" multiple />
+            <span>
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+              </svg>
+              Upload Files
+            </span>
+          </label>
+          <label class="file-upload">
+            <input onchange="uploadFolders()" type="file" id="folderUpload" directory webkitdirectory multiple />
+            <span>
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M9.828 3h3.982a2 2 0 0 1 1.992 2.181l-.637 7A2 2 0 0 1 13.174 14H2.826a2 2 0 0 1-1.991-1.819l-.637-7a1.99 1.99 0 0 1 .342-1.31L.5 3a2 2 0 0 1 2-2h3.672a2 2 0 0 1 1.414.586l.828.828A2 2 0 0 0 9.828 3zm-8.322.12C1.72 3.042 1.95 3 2.19 3h5.396l-.707-.707A1 1 0 0 0 6.172 2H2.5a1 1 0 0 0-1 .981l.006.139z"/>
+              </svg>
+              Upload Folder
+            </span>
+          </label>
+          <select id="chunk-size" title="Upload chunk size">
+            <option value="auto">Auto chunk</option>
+            <option value="1">1 MB</option>
+            <option value="5">5 MB</option>
+            <option value="10">10 MB</option>
+            <option value="20">20 MB</option>
+            <option value="50">50 MB</option>
+            <option value="100">100 MB</option>
+            <option value="200">200 MB</option>
+          </select>
+        </div>
+
+        <div class="toolbar-sep"></div>
+
+        <!-- File-action group -->
+        <div class="toolbar-group">
+          <button class="btn-action btn-action--danger" onclick="deleteSelected()">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5h9.916Z"/>
+            </svg>
+            Delete
+          </button>
+          <button class="btn-action" onclick="share()">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3ZM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5z"/>
+            </svg>
+            Share
+          </button>
+          <!-- showCreated — both #showCreatedBtn and #showCreated are siblings per JS click handler -->
+          <div class="dropdown-anchor" id="showCreatedBtn">
+            <button class="btn-action" onclick="showCreated()">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+              </svg>
+              Tokens
+              <svg width="9" height="9" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/>
+              </svg>
+            </button>
+            <div class="showCreated" id="showCreated"></div>
+          </div>
+          <button class="btn-action" onclick="openModal()">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M1 6a1 1 0 0 1 1-1h2a1 1 0 0 1 0 2H3v2.5a.5.5 0 0 1-1 0v-2.5H1a1 1 0 0 1-1-1zm4 0a1 1 0 0 1 1-1h4a1 1 0 1 1 0 2H6a1 1 0 0 1-1-1zm6 0a1 1 0 0 1 1-1h2a1 1 0 1 1 0 2h-1v2.5a.5.5 0 0 1-1 0V7h-1a1 1 0 0 1-1-1z"/>
+            </svg>
+            Compress
+          </button>
+        </div>
+
+        <div class="toolbar-sep"></div>
+
+        <!-- Code / folder group -->
+        <div class="toolbar-group">
+          <label class="new-folder">
+            <span onclick="enterCode()">Enter Code</span>
+            <input id="codeInput" class="folder-input" type="text" placeholder="Paste code…" />
+          </label>
+          <label class="new-folder">
+            <span onclick="newFolder()">New Folder</span>
+            <input id="folderInput" class="folder-input" type="text" placeholder="Folder name…" />
+          </label>
+        </div>
+
+      </div><!-- /toolbar -->
+
+      <!-- File Table -->
       <div class="tableContainer">
         <table class="table">
           <thead>
             <tr>
-              <th><input type="checkbox" id="select-all" oninput="selectAll()"></th>
-              <th>Action</th>
+              <th style="width:36px;"><input type="checkbox" id="select-all" oninput="selectAll()"></th>
+              <th style="width:56px;">Action</th>
               <th id="name">Name ↑</th>
               <th id="type">Type</th>
               <th id="size">Size</th>
-              <th id="date">Date</th>
-              <th id="mainOwner">mainOwner</th>
+              <th id="date">Date Modified</th>
+              <th id="mainOwner">Owner</th>
             </tr>
           </thead>
           <tbody id="files"></tbody>
         </table>
       </div>
-      <div class="progress-tab">
-        <div id="progressBar" class="upload-progress">
-          <h1>Transfer Status</h1>
-        </div>
-        <div id="chunkBar" class="chunk-status">
-          <h1>File Operation Status</h1>
-          <div id="chunkStatus">
-          </div>
-        </div>
+
+    </main><!-- /main-col -->
+
+    <!-- ─── Right: Transfer Panel ─── -->
+    <aside class="transfer-panel">
+      <div id="progressBar" class="upload-progress">
+        <h1>
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5A.5.5 0 0 1 .5 9.9z"/>
+            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+          </svg>
+          Transfers
+        </h1>
       </div>
-      <div class="usage">
-        <p id="userUsage"></p>
-        <p id="usage"></p>
+      <div id="chunkBar" class="chunk-status">
+        <h1>
+          <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/>
+            <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.892 3.433-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.892-1.64-.901-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.474l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115l.094-.319z"/>
+          </svg>
+          Operations
+        </h1>
+        <div id="chunkStatus"></div>
+      </div>
+    </aside>
+
+  </div><!-- /app-body -->
+
+  <!-- ══════════════  COMPRESS MODAL  ══════════════ -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()" aria-label="Close">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854z"/>
+        </svg>
+      </button>
+      <h2>Compress Files</h2>
+      <div id="modalFailed" class="loginFailed hidden">
+        <p>A file name is required.</p>
+        <p class="x-btn" onclick="closeModalError()">🗙</p>
+      </div>
+      <label for="fileName">Archive Name</label>
+      <input type="text" id="fileName" placeholder="e.g. archive.zip" autocomplete="off">
+      <label for="level">
+        Compression Level
+        <span class="slider-value" id="levelValue">0</span>
+      </label>
+      <input type="range" id="level" min="0" max="9" value="0"
+             oninput="document.getElementById('levelValue').textContent = this.value">
+      <div class="modal-actions">
+        <button style="background:var(--bg-hover);color:var(--text-2);border:1px solid var(--border-soft);" onclick="closeModal()">Cancel</button>
+        <button class="confirm-btn" onclick="submitModal()">Compress</button>
       </div>
     </div>
-    <div class="modal-overlay" id="modalOverlay">
-      <div class="modal">
-        <button class="modal-close" onclick="closeModal()" aria-label="Close">🗙</button>
-        <h2>Enter Details</h2>
-        <div id="modalFailed" class="loginFailed hidden">
-          <p>Name is required.</p>
-          <p class="x-btn" onclick="closeModalError()">🗙</p>
-        </div>
-        <label for="username">File Name</label>
-        <input type="text" id="fileName" placeholder="File name">
+  </div>
 
-        <label for="level">Compression Level</label>
-        <input type="range" id="level" min="0" max="9" value="0">
-
-        <div class="modal-actions">
-          <button class="confirm-btn" onclick="submitModal()">Confirm</button>
-        </div>
-      </div>
-    </div>
-  </main>
+  <script src="https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/build/sha256.min.js"></script>
+  <script src="./Pages/js/script.js" defer></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      updateProfile();
+      getPathData();
+      retrieveFile("/");
+      getActiveTasks();
+      activeFileOperationStatus();
+      getUsage();
+      fetch('./share?method=list');
+    });
+  </script>
 </body>
-<script src="https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/build/sha256.min.js"></script>
-<script src="./Pages/js/script.js" defer></script>
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    updateProfile();
-    getPathData();
-    retrieveFile("/");
-    getActiveTasks();
-    activeFileOperationStatus();
-    getUsage();
-    fetch(`./share?method=list`)
-  });
-</script>
-
 </html>

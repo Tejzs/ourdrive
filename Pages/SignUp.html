@@ -4,24 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Sign Up — OurDrive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./Style/styles.css">
 </head>
 
-<body>
+<body class="auth-page">
     <div class="signin-form">
-        <h1>Sign Up</h1>
+        <span class="auth-logo">☁</span>
+        <h1>Create Account</h1>
+
         <p>Email address</p>
-        <input id="mail-input" class="mail-input" type="email">
+        <input id="mail-input" class="mail-input" type="email" placeholder="you@example.com">
+
         <p>Password</p>
-        <input id="password-input" class="password-input" type="password">
+        <input id="password-input" class="password-input" type="password" placeholder="Create a strong password">
+
         <div class="show-password">
             <input type="checkbox" onclick="showPassword()" />
             <span>Show password</span>
-        </div> 
-        <p>Already a member? <a href="./SignIn.html">Sign In</a></p>
-        <button onclick="HandleSignUp()" class="login-btn">Sign Up</button>
+        </div>
+
+        <button onclick="HandleSignUp()" class="login-btn">Create Account</button>
+
+        <p class="auth-footer">Already have an account? <a href="./SignIn.html">Sign in</a></p>
     </div>
+
     <script src="./js/script.js"></script>
 </body>
 

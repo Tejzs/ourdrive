@@ -4,28 +4,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Document</title>
+  <title>Sign In — OurDrive</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./Style/styles.css" />
 </head>
 
-<body>
+<body class="auth-page">
   <div class="signin-form">
-    <h1>Sign In</h1>
+    <span class="auth-logo">☁</span>
+    <h1>OurDrive</h1>
+
     <div id="loginFailed" class="loginFailed hidden">
       <p>Incorrect email or password.</p>
       <p class="x-btn" onclick="closeBtn()">🗙</p>
     </div>
+
     <p>Email address</p>
-    <input id="mail-input" class="mail-input" type="email" />
+    <input id="mail-input" class="mail-input" type="email" placeholder="you@example.com" />
+
     <p>Password</p>
-    <input id="password-input" class="password-input" type="password" />
+    <input id="password-input" class="password-input" type="password" placeholder="••••••••" />
+
     <div class="show-password">
       <input type="checkbox" onclick="showPassword()" />
       <span>Show password</span>
     </div>
-    <p>Don't have an account? <a href="./SignUp.html">Sign Up</a></p>
+
     <button onclick="HandleSignIn()" class="login-btn">Sign In</button>
+
+    <p class="auth-footer">Don't have an account? <a href="./SignUp.html">Create one</a></p>
   </div>
+
   <script src="./js/script.js"></script>
 </body>
 
